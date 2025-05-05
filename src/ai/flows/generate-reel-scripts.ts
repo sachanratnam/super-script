@@ -35,6 +35,7 @@ export async function generateReelScripts(input: GenerateReelScriptsInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'generateReelScriptsPrompt',
+  model: 'googleai/gemini-1.5-flash', // Specify the model to use
   input: {
     schema: z.object({
       topic: z.string().describe('The topic of the reel.'),
@@ -74,7 +75,10 @@ const generateReelScriptsFlow = ai.defineFlow<
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+        throw new Error("The generation process failed to produce an output.");
+    }
+    return output;
   }
 );
 
