@@ -12,9 +12,7 @@ export default function Home() {
       <main className="w-full max-w-3xl">
         <ReelGeneratorForm />
       </main>
-      <footer className="mt-12 text-center text-muted-foreground text-sm">
-        Built with ❤️ using Next.js, ShadCN UI, and Genkit.
-      </footer>
+      {/* Footer removed as requested */}
     </div>
   );
 }
