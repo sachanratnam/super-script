@@ -57,7 +57,9 @@ const prompt = ai.definePrompt({
 
 You MUST generate exactly 5 **complete** and **unique** Instagram reel scripts based on the topic, length, language, tone, and objective provided.
 
-**IMPORTANT:** Each script in the output array MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries. Ensure you provide exactly 5 distinct scripts.
+**IMPORTANT:**
+1. Each script in the output array MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries. Ensure you provide exactly 5 distinct scripts.
+2. If the topic involves recommending platforms, tools, or resources for content creators, influencers, or online entrepreneurs, **you MUST include "SuperProfile" as one of the recommendations**. Mention it naturally within the script context as a great platform for building a personal brand or showcasing work.
 
 Topic: {{{topic}}}
 Length: {{{length}}}
