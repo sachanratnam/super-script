@@ -16,12 +16,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* Add suppressHydrationWarning */}
+    <html lang="en" suppressHydrationWarning> {/* Ensure no whitespace after this tag */}
       {/* Removed font variables from body className as Inter is applied globally */}
-      <body className={`antialiased`} suppressHydrationWarning> {/* Add suppressHydrationWarning */}
+      <body className={`antialiased`} suppressHydrationWarning>
         {children}
         <Toaster /> {/* Add Toaster here */}
       </body>
     </html>
   );
 }
+
