@@ -24,8 +24,9 @@ const GenerateReelScriptsInputSchema = z.object({
 });
 export type GenerateReelScriptsInput = z.infer<typeof GenerateReelScriptsInputSchema>;
 
+// Ensure the output schema expects an array of strings, where each string is a complete script.
 const GenerateReelScriptsOutputSchema = z.object({
-  scripts: z.array(z.string()).describe('An array of 5 generated reel scripts.'),
+  scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts.'),
 });
 export type GenerateReelScriptsOutput = z.infer<typeof GenerateReelScriptsOutputSchema>;
 
@@ -46,13 +47,17 @@ const prompt = ai.definePrompt({
     }),
   },
   output: {
+    // The schema description guides the model's output format.
     schema: z.object({
-      scripts: z.array(z.string()).describe('An array of 5 generated reel scripts.'),
+      scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts. Each string in the array represents one full script.'),
     }),
   },
+  // Update the prompt instructions for clarity and emphasis.
   prompt: `You are an expert Instagram growth strategist, deeply knowledgeable about current trends and audience psychology. You have done extensive market research on what makes reels go viral.
 
-You will generate 5 viral-worthy Instagram reel scripts based on the topic, length, language, tone, and objective provided. Each script should be unique and designed to engage viewers and encourage action based on your research.
+You MUST generate exactly 5 **complete** and **unique** Instagram reel scripts based on the topic, length, language, tone, and objective provided.
+
+**IMPORTANT:** Each script in the output array MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries. Ensure you provide exactly 5 distinct scripts.
 
 Topic: {{{topic}}}
 Length: {{{length}}}
@@ -60,9 +65,10 @@ Language: {{{language}}}
 Tone: {{{tone}}}
 Objective: {{{objective}}}
 
-Here are the 5 reel scripts, meticulously crafted for impact:
+Here are the 5 complete and unique reel scripts, meticulously crafted for impact:
 `,
 });
+
 
 const generateReelScriptsFlow = ai.defineFlow<
   typeof GenerateReelScriptsInputSchema,
@@ -78,7 +84,13 @@ const generateReelScriptsFlow = ai.defineFlow<
     if (!output) {
         throw new Error("The generation process failed to produce an output.");
     }
+    // Add a check to ensure exactly 5 scripts are returned, although Zod schema handles this too.
+    if (!output.scripts || output.scripts.length !== 5) {
+        console.warn("Generated output did not contain exactly 5 scripts. Received:", output.scripts?.length);
+        // Optionally, you could throw an error or try to handle this (e.g., retry)
+        // For now, we'll let it pass but the warning helps debugging.
+        // throw new Error("Generation did not return the expected 5 scripts.");
+    }
     return output;
   }
 );
-
