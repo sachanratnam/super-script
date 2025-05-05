@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ReelGenius AI', // Updated title
-  description: 'Generate viral Instagram reel scripts with AI.', // Updated description
+  title: 'SuperScripts', // Updated title
+  description: 'Generate viral Instagram reel scripts with SuperScripts AI.', // Updated description
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center py-12 px-4">
       <header className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-primary mb-2">ReelGenius AI</h1>
+        <h1 className="text-4xl font-bold text-primary mb-2">SuperScripts</h1>
         <p className="text-lg text-muted-foreground">
           Your expert Instagram growth consultant for viral reel scripts.
         </p>
