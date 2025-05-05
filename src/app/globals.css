@@ -10,8 +10,8 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - New Blue Palette */
-    --background: 210 30% 98%; /* Slightly cooler white */
+    /* Light Theme - Updated for white background */
+    --background: 0 0% 100%; /* Pure White */
     --foreground: 220 15% 25%; /* Dark blue-gray */
     --card: 0 0% 100%; /* White */
     --card-foreground: 220 15% 25%;
@@ -36,7 +36,7 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.75rem; /* Slightly more rounded corners */
-    --sidebar-background: 210 30% 98%;
+    --sidebar-background: 0 0% 100%; /* Sidebar matches background */
     --sidebar-foreground: 220 15% 25%;
     --sidebar-primary: 220 100% 54%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -46,7 +46,7 @@ body {
     --sidebar-ring: 220 100% 60%;
   }
   .dark {
-     /* Dark Theme - New Blue Palette */
+     /* Dark Theme - Still dark, gradients removed */
     --background: 222 30% 10%; /* Dark navy blue start (#0B0C10 approximation) */
     --foreground: 210 40% 96%; /* Light Gray */
     --card: 223 15% 18%; /* Slightly lighter dark blue (#1F1F2E approximation) */
@@ -88,15 +88,10 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    /* Adjusted background gradient for the new dark theme */
-    background-image: linear-gradient(145deg, hsl(var(--background)), hsl(223, 15%, 18%)); /* Using card color as end gradient */
-    /* Example for light theme gradient */
-    /* background-image: linear-gradient(145deg, hsl(var(--background)), hsl(var(--secondary)/0.15)); */
+    /* REMOVED background-image gradient rules */
   }
-  /* Dark theme specific gradient override */
-  .dark body {
-     background-image: linear-gradient(145deg, hsl(222, 30%, 10%), hsl(223, 15%, 18%)); /* Dark Navy to lighter dark blue */
-  }
+  /* REMOVED Dark theme specific gradient override */
+  /* .dark body { ... } */
 
   /* Smooth scroll behavior */
   html {
