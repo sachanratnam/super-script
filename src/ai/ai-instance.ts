@@ -5,21 +5,21 @@ import {googleAI} from '@genkit-ai/googleai';
 const apiKey = process.env.GOOGLE_GENAI_API_KEY;
 
 if (!apiKey) {
-  console.warn(
-    'GOOGLE_GENAI_API_KEY environment variable not set. Genkit features requiring this key may fail.'
+  // Throw an error during initialization if the key is missing.
+  // This prevents the application from trying to make API calls without a valid key.
+  throw new Error(
+    "GOOGLE_GENAI_API_KEY environment variable is not set. Please provide a valid API key in your .env file."
   );
-  // Optionally, throw an error if the key is absolutely required for the app to function
-  // throw new Error("GOOGLE_GENAI_API_KEY environment variable is not set.");
 }
 
 
 export const ai = genkit({
-  promptDir: './prompts',
+  promptDir: './prompts', // Note: promptDir is not a standard Genkit v1 option, consider removing if not used.
   plugins: [
     googleAI({
       // Read API key from environment variable
-      apiKey: apiKey,
+      apiKey: apiKey, // Pass the validated API key
     }),
   ],
-  model: 'googleai/gemini-2.0-flash',
+  // model: 'googleai/gemini-pro', // Removing default model from top level, specify in prompt/generate calls
 });
