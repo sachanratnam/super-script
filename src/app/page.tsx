@@ -9,10 +9,10 @@ export default function Home() {
           Your expert Instagram growth consultant for viral reel scripts.
         </p>
       </header>
-      <main className="w-full max-w-3xl">
+      {/* Main content area uses ReelGeneratorForm which now handles its own layout */}
+      <main className="w-full max-w-6xl"> {/* Increased max-width for two-column layout */}
         <ReelGeneratorForm />
       </main>
-      {/* Footer removed as requested */}
     </div>
   );
 }
