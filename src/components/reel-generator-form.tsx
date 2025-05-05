@@ -7,7 +7,7 @@ import { generateReelScripts } from "@/ai/flows/generate-reel-scripts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, AlertTriangle, Sparkles, Bot, ClipboardCopy } from "lucide-react";
+import { Loader2, AlertTriangle, Sparkles, ClipboardCopy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
@@ -87,11 +86,16 @@ const sortLanguages = (detectedLang: string | null): string[] => {
     lang => lang !== detectedLangName && !indianLanguages.includes(lang)
   ).sort();
 
-  return [
+  // Ensure the detected language is always first, even if not "English"
+  const sorted = [
     detectedLangName,
+    ...(detectedLangName === "English" ? [] : ["English"]), // Add English if detected wasn't English
     ...otherIndianLanguages.sort(),
     ...remainingLanguages,
   ];
+
+  // Remove duplicates (like if English was detected and also added)
+  return Array.from(new Set(sorted));
 };
 // --- End Language Data & Logic ---
 
@@ -136,7 +140,6 @@ export function ReelGeneratorForm() {
   const [defaultLanguage, setDefaultLanguage] = useState<string>("English");
 
   // --- State for Script Generation Progress (for loader) ---
-  const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState("Initializing...");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -169,7 +172,8 @@ export function ReelGeneratorForm() {
     }
 
     setDefaultLanguage(detectedLangName);
-    setSortedLanguages(sortLanguages(detectedLangName));
+    const newSortedLanguages = sortLanguages(detectedLangName);
+    setSortedLanguages(newSortedLanguages);
 
     // Reset the form with the detected language as default only if it hasn't been touched
     // Check if the language field is currently empty or still holds the initial empty string
@@ -187,30 +191,24 @@ export function ReelGeneratorForm() {
   // --- Simulate progress updates ---
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
+    let progress = 0;
     if (isLoading) {
-      setProgress(0); // Reset progress on new generation
       setLoadingMessage("Analyzing market data..."); // Updated message
       interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev < 30) {
-            setLoadingMessage("Identifying trends..."); // Updated message
-            return prev + 5;
-          } else if (prev < 70) {
-            setLoadingMessage("Developing script strategies..."); // Updated message
-            return prev + 4;
-          } else if (prev < 95) {
-            setLoadingMessage("Refining for engagement..."); // Updated message
-            return prev + 2;
+          progress = (progress + 1) % 100; // Loop progress 0-99
+          if (progress < 25) {
+            setLoadingMessage("Analyzing market data...");
+          } else if (progress < 50) {
+             setLoadingMessage("Identifying trends...");
+          } else if (progress < 75) {
+             setLoadingMessage("Developing script strategies...");
           } else {
-            setLoadingMessage("Compiling your scripts..."); // Updated message
-            return Math.min(prev + 1, 99);
+             setLoadingMessage("Refining for engagement...");
           }
-        });
-      }, 400); // Adjust interval speed as needed
+      }, 150); // Adjust interval speed as needed for the loop feeling
     } else {
       if (interval) clearInterval(interval);
-      setProgress(100); // Ensure it hits 100 when done
-      setLoadingMessage("Ready!"); // Updated message
+       setLoadingMessage("Ready!"); // Updated message
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -451,7 +449,7 @@ export function ReelGeneratorForm() {
           </CardHeader>
            <CardContent className="flex-grow overflow-hidden p-0 flex">
              {/* Container for states: loading, error, results, initial */}
-             <div className="flex-grow flex flex-col justify-center items-center h-full w-full bg-muted/20 dark:bg-muted/10 p-6">
+             <div className="flex-grow flex flex-col justify-center items-center h-full w-full bg-muted/20 dark:bg-muted/10 p-6 relative"> {/* Added relative positioning */}
               <AnimatePresence mode="wait">
                 {error && (
                    <motion.div
@@ -505,15 +503,6 @@ export function ReelGeneratorForm() {
                          </motion.div>
 
                       </div>
-                      {/* Progress Bar simulation (optional, can remove if the above animation is sufficient) */}
-                      {/* <div className="w-48 h-2 bg-muted rounded-full overflow-hidden mt-4">
-                           <motion.div
-                             className="h-full bg-primary rounded-full"
-                             initial={{ width: 0 }}
-                             animate={{ width: `${progress}%` }}
-                             transition={{ duration: 0.4, ease: "linear" }}
-                           />
-                      </div> */}
                       <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p>
                       <p className="text-sm text-muted-foreground max-w-xs">
                           Crafting scripts for maximum impact based on research... please wait.
@@ -526,9 +515,10 @@ export function ReelGeneratorForm() {
                       key="results"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="h-full w-full"
+                      className="absolute inset-0 p-6" // Use absolute positioning and padding
                     >
-                     <ScrollArea className="h-full w-full p-1 pr-4">
+                     {/* Ensure ScrollArea takes full height within the absolute positioned div */}
+                     <ScrollArea className="h-full w-full pr-4">
                       <div className="space-y-6">
                         {generatedScripts.scripts.map((script, index) => (
                           <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl relative group">
@@ -583,3 +573,6 @@ export function ReelGeneratorForm() {
 const MotionCard = motion(Card);
 const MotionScrollArea = motion(ScrollArea);
 const MotionDiv = motion.div;
+
+
+    
