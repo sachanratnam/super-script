@@ -9,7 +9,7 @@ export default function Home() {
           SuperScripts
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground/90 leading-relaxed max-w-2xl mx-auto"> {/* Slightly muted text */}
-          Craft viral-worthy Instagram reel scripts in seconds. Define your topic, tone, and goals, and let AI generate engaging content tailored for you.
+          Get tailored Instagram reel scripts crafted from extensive market research. Define your topic, tone, and goals to receive engaging content designed for maximum impact.
         </p>
       </header>
       {/* Main content area now directly uses ReelGeneratorForm */}

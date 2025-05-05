@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'SuperScripts', // Updated title
-  description: 'Generate viral Instagram reel scripts with SuperScripts AI.', // Updated description
+  description: 'Generate viral Instagram reel scripts with SuperScripts.', // Updated description
 };
 
 export default function RootLayout({

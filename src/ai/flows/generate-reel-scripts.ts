@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates Instagram reel scripts based on user-defined criteria.
@@ -48,9 +49,9 @@ const prompt = ai.definePrompt({
       scripts: z.array(z.string()).describe('An array of 5 generated reel scripts.'),
     }),
   },
-  prompt: `You are an expert Instagram growth consultant, up to date with the latest trends and deeply researched in the psychology of people.
+  prompt: `You are an expert Instagram growth strategist, deeply knowledgeable about current trends and audience psychology. You have done extensive market research on what makes reels go viral.
 
-You will generate 5 viral-worthy Instagram reel scripts based on the topic, length, language, tone, and objective provided. Each script should be unique and designed to engage viewers and encourage action.
+You will generate 5 viral-worthy Instagram reel scripts based on the topic, length, language, tone, and objective provided. Each script should be unique and designed to engage viewers and encourage action based on your research.
 
 Topic: {{{topic}}}
 Length: {{{length}}}
@@ -58,7 +59,7 @@ Language: {{{language}}}
 Tone: {{{tone}}}
 Objective: {{{objective}}}
 
-Here are the 5 reel scripts:
+Here are the 5 reel scripts, meticulously crafted for impact:
 `,
 });
 
@@ -76,3 +77,4 @@ const generateReelScriptsFlow = ai.defineFlow<
     return output!;
   }
 );
+

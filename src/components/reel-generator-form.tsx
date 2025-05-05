@@ -156,7 +156,7 @@ export function ReelGeneratorForm() {
     let detectedLangName = "English"; // Default
     try {
       // Check if running in a browser environment
-      if (typeof navigator !== 'undefined') {
+      if (typeof navigator !== 'undefined' && typeof navigator.language !== 'undefined') {
         const browserLang = navigator.language?.split('-')[0]; // Get primary language code (e.g., 'en' from 'en-US')
         if (browserLang && languageCodeMap[browserLang] && allLanguages.includes(languageCodeMap[browserLang])) {
           detectedLangName = languageCodeMap[browserLang];
@@ -173,11 +173,11 @@ export function ReelGeneratorForm() {
 
     // Reset the form with the detected language as default only if it hasn't been touched
     // Check if the language field is currently empty or still holds the initial empty string
-    if (!form.getValues('language') || form.getValues('language') === '') {
+     if (!form.formState.isDirty && !form.getValues('language')) {
         form.reset({
           ...form.getValues(), // Keep other current values
           language: detectedLangName, // Set the detected language
-        }, { keepDirty: true }); // Keep dirty state if user already interacted
+        }, { keepDirty: false }); // Ensure it doesn't mark the form as dirty initially
     }
 
 
@@ -189,20 +189,20 @@ export function ReelGeneratorForm() {
     let interval: NodeJS.Timeout | null = null;
     if (isLoading) {
       setProgress(0); // Reset progress on new generation
-      setLoadingMessage("Warming up...");
+      setLoadingMessage("Analyzing market data..."); // Updated message
       interval = setInterval(() => {
         setProgress((prev) => {
           if (prev < 30) {
-            setLoadingMessage("Analyzing trends...");
+            setLoadingMessage("Identifying trends..."); // Updated message
             return prev + 5;
           } else if (prev < 70) {
-            setLoadingMessage("Crafting script concepts...");
+            setLoadingMessage("Developing script strategies..."); // Updated message
             return prev + 4;
           } else if (prev < 95) {
-            setLoadingMessage("Optimizing for engagement...");
+            setLoadingMessage("Refining for engagement..."); // Updated message
             return prev + 2;
           } else {
-            setLoadingMessage("Finalizing scripts..."); // Keep at 95-99 until done
+            setLoadingMessage("Compiling your scripts..."); // Updated message
             return Math.min(prev + 1, 99);
           }
         });
@@ -210,7 +210,7 @@ export function ReelGeneratorForm() {
     } else {
       if (interval) clearInterval(interval);
       setProgress(100); // Ensure it hits 100 when done
-      setLoadingMessage("Done!");
+      setLoadingMessage("Ready!"); // Updated message
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -275,7 +275,7 @@ export function ReelGeneratorForm() {
                 Create Your Reel Script
             </CardTitle>
             <CardDescription className="text-muted-foreground/90 pt-1.5">
-              Fill in the details below and let us craft engaging scripts for your next viral hit.
+              Fill in the details below and let us craft engaging scripts for your next viral hit based on market insights.
             </CardDescription>
           </CardHeader>
           <Form {...form}>
@@ -337,7 +337,7 @@ export function ReelGeneratorForm() {
                           onValueChange={field.onChange}
                           defaultValue={field.value || defaultLanguage} // Use form value or detected default
                           value={field.value || defaultLanguage} // Control the value explicitly
-                          disabled={!form.formState.isDirty && !field.value && defaultLanguage === ''} // More robust check for initial state
+                          disabled={!defaultLanguage} // Disable if default language isn't set yet (avoids flicker)
                           >
                           <FormControl>
                            <SelectTrigger className="bg-background border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg">
@@ -446,7 +446,7 @@ export function ReelGeneratorForm() {
                 Your Tailored Reel Scripts
             </CardTitle>
              <CardDescription className="text-muted-foreground/90 pt-1.5">
-               Crafted based on current trends and your goals. Review, copy, and start creating engaging content!
+                Here are the scripts developed from market research based on your input. Review, copy, and start creating!
              </CardDescription>
           </CardHeader>
            <CardContent className="flex-grow overflow-hidden p-0 flex">
@@ -516,7 +516,7 @@ export function ReelGeneratorForm() {
                       </div> */}
                       <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p>
                       <p className="text-sm text-muted-foreground max-w-xs">
-                          Building scripts for maximum impact... please wait.
+                          Crafting scripts for maximum impact based on research... please wait.
                       </p>
                   </motion.div>
                 )}
@@ -567,7 +567,7 @@ export function ReelGeneratorForm() {
                     >
                      <Sparkles className="w-16 h-16 opacity-40" />
                      <p className="text-xl font-medium">Ready for Results</p>
-                     <p className="text-sm max-w-sm">Your tailored Instagram reel scripts will appear here once you provide the details and click 'Generate'.</p>
+                     <p className="text-sm max-w-sm">Your tailored Instagram reel scripts, backed by market insights, will appear here once you provide the details and click 'Generate'.</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -583,5 +583,3 @@ export function ReelGeneratorForm() {
 const MotionCard = motion(Card);
 const MotionScrollArea = motion(ScrollArea);
 const MotionDiv = motion.div;
-
-    
