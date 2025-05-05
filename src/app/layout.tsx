@@ -1,8 +1,7 @@
 
 import type {Metadata} from 'next';
-// Removed Geist font import as Inter is used in globals.css
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import { Toaster } from "@/components/ui/toaster";
 
 
 export const metadata: Metadata = {
@@ -16,13 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* Ensure no whitespace after this tag */}
-      {/* Removed font variables from body className as Inter is applied globally */}
-      <body className={`antialiased`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
         {children}
-        <Toaster /> {/* Add Toaster here */}
+        <Toaster />
       </body>
     </html>
   );
 }
-
