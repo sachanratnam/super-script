@@ -7,7 +7,7 @@ import { generateReelScripts } from "@/ai/flows/generate-reel-scripts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, AlertTriangle, Sparkles, ClipboardCopy } from "lucide-react";
+import { Loader2, AlertTriangle, Sparkles, ClipboardCopy, Share2 } from "lucide-react"; // Added Share2
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -125,8 +125,8 @@ export function ReelGeneratorForm() {
 
   useEffect(() => {
     console.log("Rendered");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   // --- Simulate progress updates ---
   useEffect(() => {
@@ -196,17 +196,61 @@ export function ReelGeneratorForm() {
   const handleCopy = (script: string, index: number) => {
      // Check if navigator.clipboard is available (client-side check)
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(script);
-      toast({
-        title: `Script ${index + 1} Copied!`,
-        description: "Ready to paste and create.",
-      });
+      navigator.clipboard.writeText(script)
+        .then(() => {
+            toast({
+              title: `Script ${index + 1} Copied!`,
+              description: "Ready to paste and create.",
+            });
+        })
+        .catch(err => {
+            console.error("Copy failed:", err);
+            toast({
+                title: "Copy Failed",
+                description: "Could not copy script to clipboard.",
+                variant: "destructive",
+            });
+        });
     } else {
       // Fallback or error message if clipboard API is not available
        toast({
         title: "Copy Failed",
-        description: "Clipboard access is not available in this environment.",
+        description: "Clipboard access is not available in this browser.",
         variant: "destructive",
+      });
+    }
+  };
+
+  const handleShare = async (script: string, index: number) => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Reel Script ${index + 1}`,
+          text: script,
+          // url: window.location.href, // Optionally share the URL of the page
+        });
+        toast({
+          title: "Script Shared!",
+          description: "Successfully shared the script.",
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+        // Don't show error if user cancels share dialog ('AbortError')
+        if ((error as DOMException)?.name !== 'AbortError') {
+          toast({
+            title: "Share Failed",
+            description: "Could not share the script.",
+            variant: "destructive",
+          });
+        }
+      }
+    } else {
+      // Fallback for browsers that don't support navigator.share
+      handleCopy(script, index); // Copy to clipboard as fallback
+      toast({
+        title: "Share Not Supported",
+        description: "Web Share API not available. Script copied instead!",
+        duration: 4000, // Show for a bit longer
       });
     }
   };
@@ -413,7 +457,7 @@ export function ReelGeneratorForm() {
              {/* Container for states: loading, error, results, initial */}
              {/* Use relative positioning for absolutely positioned results */}
               {/* Add min-height to ensure space for content on mobile */}
-              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px] lg:min-h-0">
+              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px]"> {/* Ensure min-height */}
               <AnimatePresence mode="wait">
                 {error && (
                    <motion.div
@@ -486,29 +530,43 @@ export function ReelGeneratorForm() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       // Make this div absolute to overlay within the parent
-                      className="absolute inset-0 p-6"
+                      className="absolute inset-0 p-6" // Apply padding here
                     >
-                     {/* ScrollArea now takes full height of its absolute parent */}
-                     <ScrollArea className="h-full w-full pr-4"> {/* Add padding-right for scrollbar */}
-                      <div className="space-y-6">
+                     {/* ScrollArea now takes full height of its absolute parent and handles internal scrolling */}
+                     <ScrollArea className="h-full w-full pr-1"> {/* Adjust pr for scrollbar visibility */}
+                      <div className="space-y-6 pb-6"> {/* Add padding-bottom inside scroll area */}
                         {generatedScripts.scripts.map((script, index) => (
                            // Card styling for each script
-                          <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl relative group transition-shadow hover:shadow-md">
-                             {/* Header for script number and copy button */}
+                          <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl">
+                             {/* Header for script number and action buttons */}
                              <CardHeader className="p-4 pb-2 bg-muted/30 dark:bg-muted/15 border-b border-border/50 flex flex-row items-center justify-between">
                                <CardTitle className="text-base font-semibold text-primary">
                                  Script {index + 1}
                               </CardTitle>
-                               {/* Copy button appears on hover */}
-                               <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary focus-visible:opacity-100" // Ensure focus makes it visible too
-                                  onClick={() => handleCopy(script, index)}
-                                  aria-label={`Copy script ${index + 1}`}
-                                >
-                                  <ClipboardCopy className="h-4 w-4" />
-                               </Button>
+                               {/* Action buttons */}
+                               <div className="flex items-center space-x-2">
+                                 <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                    onClick={() => handleCopy(script, index)}
+                                    aria-label={`Copy script ${index + 1}`}
+                                  >
+                                    <ClipboardCopy className="h-4 w-4" />
+                                  </Button>
+                                   {/* Share button visible only if navigator.share is available */}
+                                   {typeof navigator !== 'undefined' && navigator.share && (
+                                       <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                          onClick={() => handleShare(script, index)}
+                                          aria-label={`Share script ${index + 1}`}
+                                        >
+                                          <Share2 className="h-4 w-4" />
+                                        </Button>
+                                   )}
+                               </div>
                             </CardHeader>
                              {/* Script content */}
                             <CardContent className="p-4">
