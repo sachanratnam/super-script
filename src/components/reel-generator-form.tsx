@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { GenerateReelScriptsInput, GenerateReelScriptsOutput } from "@/ai/flows/generate-reel-scripts";
 import { generateReelScripts } from "@/ai/flows/generate-reel-scripts";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,10 +33,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea"; // Textarea not used currently
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+import { Progress } from "@/components/ui/progress"; // Import Progress
 
 const formSchema = z.object({
   topic: z.string().min(5, { message: "Topic must be at least 5 characters." }),
@@ -68,6 +68,18 @@ export function ReelGeneratorForm() {
   const [generatedScripts, setGeneratedScripts] = useState<GenerateReelScriptsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progressCount, setProgressCount] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear interval on unmount or when loading finishes
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,17 +96,41 @@ export function ReelGeneratorForm() {
     setIsLoading(true);
     setError(null);
     setGeneratedScripts(null); // Clear previous results immediately
+    setProgressCount(0); // Reset progress
+
+    // Clear previous interval if any
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // Start simulation interval - simulate generation over ~3.5 seconds
+    intervalRef.current = setInterval(() => {
+      setProgressCount((prevCount) => {
+        const nextCount = prevCount + 1;
+        if (nextCount >= 5) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          return 5; // Cap at 5
+        }
+        return nextCount;
+      });
+    }, 700); // Update every 700ms
 
     try {
       const input: GenerateReelScriptsInput = values;
       const result = await generateReelScripts(input);
+      if (intervalRef.current) clearInterval(intervalRef.current); // Stop interval immediately on success
+      setProgressCount(5); // Ensure it shows 5/5
       setGeneratedScripts(result);
+       // Short delay to show completion before hiding loader
+       setTimeout(() => setIsLoading(false), 300);
     } catch (err) {
       console.error("Error generating scripts:", err);
       setError("Failed to generate scripts. Please try again.");
-    } finally {
-      setIsLoading(false);
+      if (intervalRef.current) clearInterval(intervalRef.current); // Stop interval on error
+      setProgressCount(0); // Reset on error
+      setIsLoading(false); // Hide loader immediately on error
     }
+    // Removed finally block to handle setIsLoading in try/catch for better control
   }
 
   return (
@@ -237,7 +273,7 @@ export function ReelGeneratorForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    Generating ({progressCount}/5)...
                   </>
                 ) : (
                   "Generate Scripts"
@@ -266,15 +302,23 @@ export function ReelGeneratorForm() {
             )}
 
             {isLoading && (
-              <div className="space-y-4 p-4">
-                {[...Array(5)].map((_, index) => (
-                  <div key={index} className="space-y-2 p-4 border rounded-md bg-secondary/30">
+              <div className="space-y-4 p-4 h-full flex flex-col justify-center items-center">
+                {/* Progress Bar and Text */}
+                <div className="w-full max-w-xs text-center mb-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Generating script {progressCount} of 5...
+                    </p>
+                    <Progress value={(progressCount / 5) * 100} className="w-full h-2" />
+                </div>
+
+                {/* Placeholder Skeleton */}
+                 <div className="space-y-2 p-4 border rounded-md bg-secondary/30 w-full opacity-50">
                     <Skeleton className="h-5 w-1/4" />
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-5/6" />
                     <Skeleton className="h-4 w-3/4" />
                   </div>
-                ))}
+                 {/* Add more skeletons if needed, or keep it simple */}
               </div>
             )}
 
