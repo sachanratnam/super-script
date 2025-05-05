@@ -1,22 +1,13 @@
 
 import type {Metadata} from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+// Removed Geist font import as Inter is used in globals.css
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
 
 export const metadata: Metadata = {
   title: 'SuperScripts', // Updated title
-  description: 'Generate viral Instagram reel scripts with SuperScripts.', // Updated description
+  description: 'Get tailored Instagram reel scripts crafted from extensive market research.', // Updated description to match page
 };
 
 export default function RootLayout({
@@ -26,7 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      {/* Removed font variables from body className as Inter is applied globally */}
+      <body className={`antialiased`}>
         {children}
         <Toaster /> {/* Add Toaster here */}
       </body>

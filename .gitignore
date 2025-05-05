@@ -4,7 +4,6 @@
 /node_modules
 /.pnp
 .pnp.js
-.yarn/install-state.gz
 
 # testing
 /coverage
@@ -37,5 +36,29 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# genkit state
-.genkit/state.json
+# misc
+*.log
+*.backup
+*.temp
+
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+
+# IDEs and editors
+/.idea
+*.project
+*.swp
+*~
+.project
+.settings
+.tmproj
+
+# Firebase
+*.firebase.*
+*.firebaserc
+firebase-debug.log
