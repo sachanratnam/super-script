@@ -155,25 +155,31 @@ export function ReelGeneratorForm() {
   useEffect(() => {
     let detectedLangName = "English"; // Default
     try {
-      const browserLang = navigator.language?.split('-')[0]; // Get primary language code (e.g., 'en' from 'en-US')
-      if (browserLang && languageCodeMap[browserLang] && allLanguages.includes(languageCodeMap[browserLang])) {
-        detectedLangName = languageCodeMap[browserLang];
+      // Check if running in a browser environment
+      if (typeof navigator !== 'undefined') {
+        const browserLang = navigator.language?.split('-')[0]; // Get primary language code (e.g., 'en' from 'en-US')
+        if (browserLang && languageCodeMap[browserLang] && allLanguages.includes(languageCodeMap[browserLang])) {
+          detectedLangName = languageCodeMap[browserLang];
+        }
       }
     } catch (e) {
       console.warn("Could not detect browser language:", e);
-      // Fallback to English if detection fails
+      // Fallback to English if detection fails or not in browser
       detectedLangName = "English";
     }
-
 
     setDefaultLanguage(detectedLangName);
     setSortedLanguages(sortLanguages(detectedLangName));
 
-    // Reset the form with the detected language as default
-    form.reset({
-      ...form.getValues(), // Keep other current values
-      language: detectedLangName, // Set the detected language
-    });
+    // Reset the form with the detected language as default only if it hasn't been touched
+    // Check if the language field is currently empty or still holds the initial empty string
+    if (!form.getValues('language') || form.getValues('language') === '') {
+        form.reset({
+          ...form.getValues(), // Keep other current values
+          language: detectedLangName, // Set the detected language
+        }, { keepDirty: true }); // Keep dirty state if user already interacted
+    }
+
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs once on mount
@@ -183,17 +189,17 @@ export function ReelGeneratorForm() {
     let interval: NodeJS.Timeout | null = null;
     if (isLoading) {
       setProgress(0); // Reset progress on new generation
-      setLoadingMessage("Warming up the AI...");
+      setLoadingMessage("Warming up...");
       interval = setInterval(() => {
         setProgress((prev) => {
           if (prev < 30) {
-            setLoadingMessage("Analyzing your request...");
+            setLoadingMessage("Analyzing trends...");
             return prev + 5;
           } else if (prev < 70) {
-            setLoadingMessage("Crafting script ideas...");
+            setLoadingMessage("Crafting script concepts...");
             return prev + 4;
           } else if (prev < 95) {
-            setLoadingMessage("Refining and polishing...");
+            setLoadingMessage("Optimizing for engagement...");
             return prev + 2;
           } else {
             setLoadingMessage("Finalizing scripts..."); // Keep at 95-99 until done
@@ -222,14 +228,14 @@ export function ReelGeneratorForm() {
       setGeneratedScripts(result);
        toast({ // Success toast
           title: "Scripts Generated!",
-          description: "Your viral-worthy reel scripts are ready.",
+          description: "Your high-impact reel scripts are ready.",
           variant: "default",
         });
     } catch (err) {
       console.error("Error generating scripts:", err);
-      setError("Hmm, couldn't quite generate scripts with that. Could you try rephrasing your topic or adjusting the settings? Sometimes a different approach sparks the AI's creativity!");
+      setError("Hmm, couldn't quite generate scripts with that. Could you try rephrasing your topic or adjusting the settings? Sometimes a different approach sparks more creativity!");
        toast({ // Error toast
-          title: "Generation Failed",
+          title: "Generation Issue",
           description: "Please refine your input and try again.",
           variant: "destructive",
         });
@@ -239,11 +245,21 @@ export function ReelGeneratorForm() {
   }
 
   const handleCopy = (script: string, index: number) => {
-    navigator.clipboard.writeText(script);
-    toast({
-      title: `Script ${index + 1} Copied!`,
-      description: "Ready to paste and create.",
-    });
+     // Check if navigator.clipboard is available (client-side check)
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(script);
+      toast({
+        title: `Script ${index + 1} Copied!`,
+        description: "Ready to paste and create.",
+      });
+    } else {
+      // Fallback or error message if clipboard API is not available
+       toast({
+        title: "Copy Failed",
+        description: "Clipboard access is not available in this environment.",
+        variant: "destructive",
+      });
+    }
   };
 
 
@@ -259,7 +275,7 @@ export function ReelGeneratorForm() {
                 Create Your Reel Script
             </CardTitle>
             <CardDescription className="text-muted-foreground/90 pt-1.5">
-              Fill in the details below and let AI craft engaging scripts for your next viral hit.
+              Fill in the details below and let us craft engaging scripts for your next viral hit.
             </CardDescription>
           </CardHeader>
           <Form {...form}>
@@ -321,7 +337,7 @@ export function ReelGeneratorForm() {
                           onValueChange={field.onChange}
                           defaultValue={field.value || defaultLanguage} // Use form value or detected default
                           value={field.value || defaultLanguage} // Control the value explicitly
-                          disabled={!form.formState.isDirty && !field.value} // Disable until useEffect sets value or user interacts
+                          disabled={!form.formState.isDirty && !field.value && defaultLanguage === ''} // More robust check for initial state
                           >
                           <FormControl>
                            <SelectTrigger className="bg-background border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg">
@@ -426,11 +442,11 @@ export function ReelGeneratorForm() {
         <Card className="shadow-lg flex-grow flex flex-col border border-border/30 bg-card rounded-2xl overflow-hidden">
           <CardHeader className="p-6 pb-3 border-b border-border/30">
              <CardTitle className="text-xl font-semibold text-foreground/90 flex items-center gap-2">
-                <Bot className="w-6 h-6 text-primary" />
-                AI Generated Scripts
+                <Sparkles className="w-6 h-6 text-primary" /> {/* Changed icon */}
+                Your Tailored Reel Scripts
             </CardTitle>
              <CardDescription className="text-muted-foreground/90 pt-1.5">
-               Here are the scripts generated based on your input. Review, copy, and create!
+               Crafted based on current trends and your goals. Review, copy, and start creating engaging content!
              </CardDescription>
           </CardHeader>
            <CardContent className="flex-grow overflow-hidden p-0 flex">
@@ -447,7 +463,7 @@ export function ReelGeneratorForm() {
                     >
                      <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-lg">
                        <AlertTriangle className="h-5 w-5 text-destructive" />
-                       <AlertTitle className="font-semibold">Generation Failed</AlertTitle>
+                       <AlertTitle className="font-semibold">Generation Issue</AlertTitle>
                        <AlertDescription className="text-destructive/90">
                          {error}
                        </AlertDescription>
@@ -465,22 +481,42 @@ export function ReelGeneratorForm() {
                     >
                       {/* Enhanced Loader */}
                       <div className="relative w-20 h-20">
-                         <div className="absolute inset-0 border-4 border-primary/30 rounded-full animate-pulse"></div>
-                         <Loader2 className="absolute inset-2 w-16 h-16 text-primary animate-spin" />
-                         <Sparkles className="absolute top-1/2 left-1/2 w-8 h-8 -translate-x-1/2 -translate-y-1/2 text-primary opacity-90" />
+                         {/* Orbiting animation */}
+                         <motion.div
+                           className="absolute inset-0 border-4 border-primary/20 rounded-full"
+                           initial={{ scale: 0.8, opacity: 0.5 }}
+                           animate={{ scale: 1.1, opacity: 0 }}
+                           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                         />
+                         <motion.div
+                           className="absolute inset-2 border-4 border-primary/30 rounded-full"
+                           initial={{ scale: 0.9, opacity: 0.7 }}
+                           animate={{ scale: 1.05, opacity: 0.2 }}
+                           transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                         />
+                          {/* Central pulsing icon */}
+                         <motion.div
+                           className="absolute inset-0 flex items-center justify-center"
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut"}}
+                         >
+                            <Sparkles className="w-10 h-10 text-primary opacity-90" />
+                         </motion.div>
+
                       </div>
-                      {/* Progress Bar */}
-                      <div className="w-48 h-2 bg-muted rounded-full overflow-hidden mt-4">
+                      {/* Progress Bar simulation (optional, can remove if the above animation is sufficient) */}
+                      {/* <div className="w-48 h-2 bg-muted rounded-full overflow-hidden mt-4">
                            <motion.div
                              className="h-full bg-primary rounded-full"
                              initial={{ width: 0 }}
                              animate={{ width: `${progress}%` }}
                              transition={{ duration: 0.4, ease: "linear" }}
                            />
-                      </div>
-                      <p className="text-lg font-medium text-foreground/80 pt-2">{loadingMessage}</p>
+                      </div> */}
+                      <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p>
                       <p className="text-sm text-muted-foreground max-w-xs">
-                          Crafting scripts that aim for maximum engagement... please wait.
+                          Building scripts for maximum impact... please wait.
                       </p>
                   </motion.div>
                 )}
@@ -511,7 +547,8 @@ export function ReelGeneratorForm() {
                                </Button>
                             </CardHeader>
                             <CardContent className="p-4">
-                               <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</pre>
+                               {/* Use pre-wrap for better line break handling */}
+                               <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</p>
                             </CardContent>
                           </Card>
                         ))}
@@ -530,7 +567,7 @@ export function ReelGeneratorForm() {
                     >
                      <Sparkles className="w-16 h-16 opacity-40" />
                      <p className="text-xl font-medium">Ready for Results</p>
-                     <p className="text-sm max-w-sm">Your AI-generated Instagram reel scripts will appear here once you provide the details and click 'Generate'.</p>
+                     <p className="text-sm max-w-sm">Your tailored Instagram reel scripts will appear here once you provide the details and click 'Generate'.</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -546,3 +583,5 @@ export function ReelGeneratorForm() {
 const MotionCard = motion(Card);
 const MotionScrollArea = motion(ScrollArea);
 const MotionDiv = motion.div;
+
+    
