@@ -121,8 +121,12 @@ export function ReelGeneratorForm() {
     form.setValue('language', defaultLanguage, { shouldValidate: false, shouldDirty: false });
 
   // Only run once on mount
+  }, [defaultLanguage, form]);
+
+  useEffect(() => {
+    console.log("Rendered");
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   // --- Simulate progress updates ---
   useEffect(() => {
@@ -215,7 +219,7 @@ export function ReelGeneratorForm() {
       {/* Left Column / Top Section: Form */}
        <div className="w-full lg:w-2/5 flex-shrink-0">
          {/* Card styling adjusted for Material Design feel */}
-        <Card className="shadow-lg border border-border/30 bg-card rounded-2xl overflow-hidden">
+        <Card className="shadow-lg border-border/30 bg-card rounded-2xl overflow-hidden">
            {/* Header styling adjusted */}
            <CardHeader className="p-6 pb-4 bg-gradient-to-br from-card to-muted/30 dark:from-card dark:to-muted/10">
              <CardTitle className="text-2xl font-semibold text-primary flex items-center gap-2.5"> {/* Use primary color */}
@@ -408,7 +412,8 @@ export function ReelGeneratorForm() {
            <CardContent className="flex-grow overflow-hidden p-0 flex">
              {/* Container for states: loading, error, results, initial */}
              {/* Use relative positioning for absolutely positioned results */}
-             <div className="flex-grow flex flex-col justify-center items-center h-full w-full bg-muted/20 dark:bg-muted/10 p-6 relative">
+              {/* Add min-height to ensure space for content on mobile */}
+              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px] lg:min-h-0">
               <AnimatePresence mode="wait">
                 {error && (
                    <motion.div
