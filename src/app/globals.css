@@ -10,75 +10,75 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Material Design 3 Inspired (Adjusted) */
-    --background: 210 20% 98%; /* Lighter, slightly cool gray */
-    --foreground: 210 10% 15%; /* Darker gray */
-    --card: 210 25% 100%; /* Slightly off-white */
-    --card-foreground: 210 10% 15%;
-    --popover: 210 25% 100%;
-    --popover-foreground: 210 10% 15%;
-    --primary: 262 80% 55%; /* M3 Primary (Purple-ish) */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
-    --secondary: 260 60% 95%; /* M3 Secondary Container (Lighter Purple) */
-    --secondary-foreground: 260 50% 30%; /* M3 On Secondary Container */
-    --muted: 210 20% 94%; /* Lighter Muted */
-    --muted-foreground: 210 10% 45%; /* Darker muted text */
-    --accent: 260 70% 70%; /* M3 Tertiary (Lighter Purple/Pink) */
-    --accent-foreground: 260 50% 20%; /* M3 On Tertiary */
+    /* Light Theme - New Blue Palette */
+    --background: 210 30% 98%; /* Slightly cooler white */
+    --foreground: 220 15% 25%; /* Dark blue-gray */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 220 15% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 25%;
+    --primary: 220 100% 54%; /* #1557ff */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 223 100% 92%; /* Lighter version of #9cb8ff */
+    --secondary-foreground: 220 80% 40%; /* Darker blue */
+    --muted: 210 30% 94%; /* Light cool gray */
+    --muted-foreground: 210 15% 55%; /* Medium gray */
+    --accent: 204 100% 72%; /* #70c8ff */
+    --accent-foreground: 204 80% 25%; /* Dark cyan-blue */
     --destructive: 0 75% 60%; /* M3 Error (Red) */
     --destructive-foreground: 0 0% 100%; /* M3 On Error */
-    --border: 210 15% 88%; /* Subtle border */
-    --input: 210 20% 96%; /* Slightly off-white input background */
-    --ring: 262 85% 65%; /* Primary color for focus rings, slightly lighter */
-    --chart-1: 12 76% 61%;
+    --border: 220 40% 90%; /* Light blue-gray border */
+    --input: 220 50% 96%; /* Very light blue input */
+    --ring: 220 100% 60%; /* Slightly lighter primary for ring */
+    --chart-1: 12 76% 61%; /* Keep chart colors or adjust if needed */
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.75rem; /* Slightly more rounded corners (M3 uses various radii) */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --radius: 0.75rem; /* Slightly more rounded corners */
+    --sidebar-background: 210 30% 98%;
+    --sidebar-foreground: 220 15% 25%;
+    --sidebar-primary: 220 100% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 40% 94%;
+    --sidebar-accent-foreground: 220 15% 25%;
+    --sidebar-border: 220 40% 90%;
+    --sidebar-ring: 220 100% 60%;
   }
   .dark {
-     /* Dark Theme - Material Design 3 Inspired (Adjusted) */
-    --background: 215 28% 12%; /* Darker background */
+     /* Dark Theme - New Blue Palette */
+    --background: 222 30% 10%; /* Dark navy blue start (#0B0C10 approximation) */
     --foreground: 210 40% 96%; /* Light Gray */
-    --card: 215 25% 18%; /* Slightly lighter card surface */
+    --card: 223 15% 18%; /* Slightly lighter dark blue (#1F1F2E approximation) */
     --card-foreground: 210 40% 96%;
-    --popover: 215 28% 15%; /* Darker Popover */
+    --popover: 222 25% 15%; /* Darker Popover */
     --popover-foreground: 210 40% 96%;
-    --primary: 262 85% 75%; /* M3 Primary (Lighter Purple) */
-    --primary-foreground: 260 50% 15%; /* Dark text on primary */
-    --secondary: 260 40% 30%; /* M3 Secondary Container (Darker Purple) */
-    --secondary-foreground: 260 70% 90%; /* M3 On Secondary Container */
-    --muted: 215 20% 22%; /* Darker Muted */
+    --primary: 220 100% 64%; /* Lighter #1557ff */
+    --primary-foreground: 220 100% 15%; /* Dark blue text on primary */
+    --secondary: 223 40% 30%; /* Darker version of #9cb8ff */
+    --secondary-foreground: 223 80% 85%; /* Lighter text for secondary */
+    --muted: 220 20% 22%; /* Darker Muted */
     --muted-foreground: 210 20% 70%; /* Lighter muted text */
-    --accent: 260 60% 55%; /* M3 Tertiary (Darker Purple/Pink) */
-    --accent-foreground: 260 80% 95%; /* M3 On Tertiary */
+    --accent: 204 80% 55%; /* Darker #70c8ff */
+    --accent-foreground: 204 100% 90%; /* Lighter text for accent */
     --destructive: 0 70% 70%; /* M3 Error (Lighter Red) */
     --destructive-foreground: 0 100% 15%; /* M3 On Error (Dark Red) */
-    --border: 215 20% 25%; /* Subtle border */
-    --input: 215 25% 20%; /* Input background slightly lighter than card */
-    --ring: 262 90% 80%; /* Primary color ring, slightly lighter */
-    --chart-1: 220 70% 50%;
+    --border: 220 25% 25%; /* Subtle dark blue border */
+    --input: 220 28% 20%; /* Input background slightly lighter than card */
+    --ring: 220 100% 70%; /* Primary color ring, lighter */
+    --chart-1: 220 70% 50%; /* Keep chart colors or adjust if needed */
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 30% 10%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 220 100% 64%;
+    --sidebar-primary-foreground: 220 100% 15%;
+    --sidebar-accent: 220 28% 15%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 220 25% 25%;
+    --sidebar-ring: 220 100% 70%;
   }
 }
 
@@ -88,8 +88,14 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    /* Add subtle background gradient for depth - Adjusted for M3 feel */
-    background-image: linear-gradient(145deg, hsl(var(--background)), hsl(var(--secondary)/0.15));
+    /* Adjusted background gradient for the new dark theme */
+    background-image: linear-gradient(145deg, hsl(var(--background)), hsl(223, 15%, 18%)); /* Using card color as end gradient */
+    /* Example for light theme gradient */
+    /* background-image: linear-gradient(145deg, hsl(var(--background)), hsl(var(--secondary)/0.15)); */
+  }
+  /* Dark theme specific gradient override */
+  .dark body {
+     background-image: linear-gradient(145deg, hsl(222, 30%, 10%), hsl(223, 15%, 18%)); /* Dark Navy to lighter dark blue */
   }
 
   /* Smooth scroll behavior */
