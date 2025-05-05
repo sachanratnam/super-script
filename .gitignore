@@ -1,64 +1,61 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js build output
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# local env files
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Environment variables
 .env*.local
-.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env # Ensure the main .env file is ignored
 
-# vercel
-.vercel
+# Browserslist cache file
+.browserslistcache
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Turborepo
+.turbo
 
-# misc
-*.log
-*.backup
-*.temp
-
-# Editor directories and files
+# IDE files
+.idea
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.sublime-workspace
+!.vscode/settings.json # Keep project-specific VSCode settings if desired
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# IDEs and editors
-/.idea
-*.project
-*.swp
-*~
-.project
-.settings
-.tmproj
+# TypeScript cache
+*.tsbuildinfo
 
-# Firebase
-*.firebase.*
-*.firebaserc
-firebase-debug.log
+# Optional eslint cache
+.eslintcache
