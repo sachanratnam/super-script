@@ -137,7 +137,7 @@ export function ReelGeneratorForm() {
 
   // State for dynamic language sorting and default
   const [sortedLanguages, setSortedLanguages] = useState<string[]>(() => sortLanguages(null)); // Initial sort with English default
-  const [defaultLanguage, setDefaultLanguage] = useState<string>("English");
+  const [defaultLanguage, setDefaultLanguage] = useState<string>(""); // Initialize as empty string
 
   // --- State for Script Generation Progress (for loader) ---
   const [loadingMessage, setLoadingMessage] = useState("Initializing...");
@@ -175,18 +175,16 @@ export function ReelGeneratorForm() {
     const newSortedLanguages = sortLanguages(detectedLangName);
     setSortedLanguages(newSortedLanguages);
 
-    // Reset the form with the detected language as default only if it hasn't been touched
-    // Check if the language field is currently empty or still holds the initial empty string
-     if (!form.formState.isDirty && !form.getValues('language')) {
-        form.reset({
-          ...form.getValues(), // Keep other current values
-          language: detectedLangName, // Set the detected language
-        }, { keepDirty: false }); // Ensure it doesn't mark the form as dirty initially
+    // Set the form's default language value after detection, but don't overwrite if user interacted
+    // Check if the language field is currently empty or holds the initial empty string value
+    // This prevents overwriting a user's selection if they change it before detection completes
+    if (!form.formState.isDirty && !form.getValues('language')) {
+      form.setValue('language', detectedLangName, { shouldValidate: false, shouldDirty: false });
     }
 
-
+  // Only run once on mount, form dependency removed to avoid re-running on form changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   // --- Simulate progress updates ---
   useEffect(() => {
@@ -290,6 +288,7 @@ export function ReelGeneratorForm() {
                           placeholder="Describe the core idea... e.g., 'Quick 3-ingredient healthy snacks for busy mornings'"
                           {...field}
                           className="min-h-[110px] resize-none bg-background focus:bg-background border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg"
+                          suppressHydrationWarning // Add suppressHydrationWarning here
                         />
                       </FormControl>
                       <FormMessage />
@@ -333,7 +332,6 @@ export function ReelGeneratorForm() {
                         <Select
                           key={defaultLanguage} // Add key here
                           onValueChange={field.onChange}
-                          defaultValue={field.value || defaultLanguage} // Use form value or detected default
                           value={field.value || defaultLanguage} // Control the value explicitly
                           disabled={!defaultLanguage} // Disable if default language isn't set yet (avoids flicker)
                           >
@@ -573,6 +571,3 @@ export function ReelGeneratorForm() {
 const MotionCard = motion(Card);
 const MotionScrollArea = motion(ScrollArea);
 const MotionDiv = motion.div;
-
-
-    
