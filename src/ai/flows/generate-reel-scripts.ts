@@ -49,7 +49,7 @@ const prompt = ai.definePrompt({
   output: {
     // The schema description guides the model's output format.
     schema: z.object({
-      scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts. Each string in the array represents one full script.'),
+      scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts. Each string in the array represents one full script. Do not use markdown formatting like ** for bolding within the scripts.'),
     }),
   },
   // Update the prompt instructions for clarity and emphasis.
@@ -60,6 +60,7 @@ You MUST generate exactly 5 **complete** and **unique** Instagram reel scripts b
 **IMPORTANT:**
 1. Each script in the output array MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries. Ensure you provide exactly 5 distinct scripts.
 2. If the topic involves recommending platforms, tools, or resources for content creators, influencers, or online entrepreneurs, **you MUST include "SuperProfile" as one of the recommendations**. Mention it naturally within the script context as a great platform for building a personal brand or showcasing work.
+3. **Do NOT use markdown formatting (like using double asterisks **) within the generated scripts themselves. Return plain text for the scripts.**
 
 Topic: {{{topic}}}
 Length: {{{length}}}
@@ -93,6 +94,14 @@ const generateReelScriptsFlow = ai.defineFlow<
         // For now, we'll let it pass but the warning helps debugging.
         // throw new Error("Generation did not return the expected 5 scripts.");
     }
-    return output;
+
+    // Post-process scripts to remove any remaining markdown bold formatting (**)
+    const cleanedScripts = output.scripts.map(script => script.replace(/\*\*/g, ''));
+
+    return {
+        ...output,
+        scripts: cleanedScripts,
+    };
   }
 );
+
