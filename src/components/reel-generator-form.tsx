@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react"; // Import useEffect
+import { useState } from "react"; // Removed useEffect
 import type { GenerateReelScriptsInput, GenerateReelScriptsOutput } from "@/ai/flows/generate-reel-scripts";
 import { generateReelScripts } from "@/ai/flows/generate-reel-scripts";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,11 +67,7 @@ export function ReelGeneratorForm() {
   const [generatedScripts, setGeneratedScripts] = useState<GenerateReelScriptsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false); // State to track client-side mount
-
-  useEffect(() => {
-    setIsClient(true); // Set to true only on the client after mounting
-  }, []);
+  // Removed isClient state and useEffect
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -115,31 +111,24 @@ export function ReelGeneratorForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-6">
-              {isClient ? ( // Only render FormField for topic on the client
-                <FormField
-                  control={form.control}
-                  name="topic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-semibold">Reel Topic</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., 'Easy 5-minute breakfast ideas'"
-                          {...field}
-                          className="text-base md:text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ) : (
-                // Render a placeholder during SSR and initial client render
-                <div className="space-y-2">
-                  <Skeleton className="h-5 w-24" /> {/* Placeholder for label */}
-                  <Skeleton className="h-10 w-full" /> {/* Placeholder for input */}
-                </div>
-              )}
+              {/* Always render FormField for topic */}
+              <FormField
+                control={form.control}
+                name="topic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Reel Topic</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., 'Easy 5-minute breakfast ideas'"
+                        {...field}
+                        className="text-base md:text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <FormField
@@ -246,7 +235,8 @@ export function ReelGeneratorForm() {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button type="submit" disabled={isLoading || !isClient} className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3">
+              {/* Removed disabled={!isClient} */}
+              <Button type="submit" disabled={isLoading} className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -329,3 +319,4 @@ export function ReelGeneratorForm() {
     </div>
   );
 }
+
