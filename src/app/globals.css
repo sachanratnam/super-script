@@ -1,38 +1,41 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; /* More modern font stack */
+  @apply antialiased; /* Apply antialiasing */
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
-    --foreground: 210 10% 23%; /* Dark grayish blue */
-    --card: 0 0% 100%;
-    --card-foreground: 210 10% 23%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 23%;
-    --primary: 200 70% 60%; /* Light Blue */
-    --primary-foreground: 210 40% 9%; /* Dark blue/black */
-    --secondary: 210 40% 96.1%; /* Very light gray-blue */
-    --secondary-foreground: 210 10% 23%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 210 7% 60%; /* Lighter gray */
-    --accent: 180 80% 30%; /* Teal */
-    --accent-foreground: 180 80% 96%; /* Very light teal/white */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 88%; /* Lighter border */
-    --input: 210 20% 94%; /* Slightly darker input bg */
-    --ring: 200 70% 60%; /* Primary color for focus rings */
+    /* Light Theme - Material Design 3 Inspired (Adjusted) */
+    --background: 210 20% 98%; /* Lighter, slightly cool gray */
+    --foreground: 210 10% 15%; /* Darker gray */
+    --card: 210 25% 100%; /* Slightly off-white */
+    --card-foreground: 210 10% 15%;
+    --popover: 210 25% 100%;
+    --popover-foreground: 210 10% 15%;
+    --primary: 262 80% 55%; /* M3 Primary (Purple-ish) */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --secondary: 260 60% 95%; /* M3 Secondary Container (Lighter Purple) */
+    --secondary-foreground: 260 50% 30%; /* M3 On Secondary Container */
+    --muted: 210 20% 94%; /* Lighter Muted */
+    --muted-foreground: 210 10% 45%; /* Darker muted text */
+    --accent: 260 70% 70%; /* M3 Tertiary (Lighter Purple/Pink) */
+    --accent-foreground: 260 50% 20%; /* M3 On Tertiary */
+    --destructive: 0 75% 60%; /* M3 Error (Red) */
+    --destructive-foreground: 0 0% 100%; /* M3 On Error */
+    --border: 210 15% 88%; /* Subtle border */
+    --input: 210 20% 96%; /* Slightly off-white input background */
+    --ring: 262 85% 65%; /* Primary color for focus rings, slightly lighter */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly more rounded corners (M3 uses various radii) */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -43,25 +46,26 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 210 10% 10%; /* Dark Blue/Gray */
-    --foreground: 0 0% 98%; /* White */
-    --card: 210 10% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 210 10% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 200 70% 60%; /* Keep light blue primary */
-    --primary-foreground: 210 40% 9%; /* Dark text on primary */
-    --secondary: 210 10% 15%; /* Darker secondary */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 210 10% 15%;
-    --muted-foreground: 210 7% 60%; /* Lighter gray */
-    --accent: 180 70% 40%; /* Slightly lighter Teal for dark */
-    --accent-foreground: 180 80% 96%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 20%; /* Darker border */
-    --input: 210 10% 15%;
-    --ring: 200 70% 60%;
+     /* Dark Theme - Material Design 3 Inspired (Adjusted) */
+    --background: 215 28% 12%; /* Darker background */
+    --foreground: 210 40% 96%; /* Light Gray */
+    --card: 215 25% 18%; /* Slightly lighter card surface */
+    --card-foreground: 210 40% 96%;
+    --popover: 215 28% 15%; /* Darker Popover */
+    --popover-foreground: 210 40% 96%;
+    --primary: 262 85% 75%; /* M3 Primary (Lighter Purple) */
+    --primary-foreground: 260 50% 15%; /* Dark text on primary */
+    --secondary: 260 40% 30%; /* M3 Secondary Container (Darker Purple) */
+    --secondary-foreground: 260 70% 90%; /* M3 On Secondary Container */
+    --muted: 215 20% 22%; /* Darker Muted */
+    --muted-foreground: 210 20% 70%; /* Lighter muted text */
+    --accent: 260 60% 55%; /* M3 Tertiary (Darker Purple/Pink) */
+    --accent-foreground: 260 80% 95%; /* M3 On Tertiary */
+    --destructive: 0 70% 70%; /* M3 Error (Lighter Red) */
+    --destructive-foreground: 0 100% 15%; /* M3 On Error (Dark Red) */
+    --border: 215 20% 25%; /* Subtle border */
+    --input: 215 25% 20%; /* Input background slightly lighter than card */
+    --ring: 262 90% 80%; /* Primary color ring, slightly lighter */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -84,5 +88,46 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    /* Add subtle background gradient for depth - Adjusted for M3 feel */
+    background-image: linear-gradient(145deg, hsl(var(--background)), hsl(var(--secondary)/0.15));
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Improve focus visibility */
+   *:focus-visible {
+       @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    }
+}
+
+/* Custom scrollbar styles (optional, for aesthetics) */
+@layer utilities {
+  /* For Webkit browsers (Chrome, Safari) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background) / 0.5);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4); /* Softer thumb color */
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.6); /* Slightly darker on hover */
+  }
+
+  /* For Firefox */
+  /* Note: Firefox scrollbar styling is less customizable */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--background) / 0.5);
   }
 }
