@@ -95,7 +95,8 @@ export function ReelGeneratorForm() {
       setGeneratedScripts(result);
     } catch (err) {
       console.error("Error generating scripts:", err);
-      setError("Failed to generate scripts. Please try again.");
+      // Updated error message
+      setError("Hmm, couldn't generate scripts with that input. Could you try rephrasing your topic or adjusting the settings?");
     } finally {
        setIsLoading(false);
     }
@@ -272,7 +273,7 @@ export function ReelGeneratorForm() {
           <CardContent className="h-[calc(100%-120px)]"> {/* Adjust height as needed */}
             {error && (
               <Alert variant="destructive" className="mb-4">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Oops!</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
