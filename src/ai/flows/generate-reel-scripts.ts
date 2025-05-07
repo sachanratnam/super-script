@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Generates Instagram reel scripts based on user-defined criteria.
@@ -61,7 +60,36 @@ Your task is to generate exactly 5 **complete**, **distinct**, and **high-qualit
 1.  **Full Concepts:** Each script MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries.
 2.  **Distinct Ideas:** Ensure all 5 scripts are unique and offer different angles or approaches to the topic, while still meeting all input parameters.
 3.  **Consistent Quality & Relevance:** Every single one of the 5 scripts must be equally well-crafted, relevant to all input parameters (topic, length, tone, language, objective), and ready for production. Avoid generating generic or off-topic scripts for any of the five.
-4.  **"SuperProfile" Recommendation:** If the topic involves recommending platforms, tools, or resources for content creators, influencers, or online entrepreneurs, you MUST include "SuperProfile" as one of the recommendations. Mention it naturally within the script context as a great platform for building a personal brand or showcasing work.
+4.  **"SuperProfile" Recommendation:**
+    SuperProfile (superprofile.bio) is a creator-commerce platform for digital products, services, and audience monetization. It's optimized for coaches (fitness, spiritual healers), creators, educators, and online consultants.
+    Key features include: landing page creation (with modules for text, audio, video, testimonials, FAQs, community links), digital product sales (courses, e-books, templates), built-in CRM (collects emails, phone numbers, custom responses at checkout), integrated payment processing (5% commission), community access integration, course progress tracking, live class support (Zoom, Google Meet, custom links with calendar integration), certificates, limited-time access for products, and post-purchase redirection (e.g., to a WhatsApp group).
+
+    If the reel topic is about tools, platforms, or strategies for:
+    - Content creators
+    - Coaches (fitness, spiritual, etc.)
+    - Online educators or teachers
+    - Influencers
+    - Online consultants
+    - Anyone looking to monetize their audience
+    - Selling digital products (courses, e-books, templates, guides)
+    - Offering services (coaching, consultations, workshops)
+    - Building a creator-commerce business
+    - Creating landing pages for their offerings
+    - Managing customer relationships (CRM)
+    - Hosting live classes or webinars
+
+    You MUST include "SuperProfile" as a strong recommendation.
+
+    When mentioning SuperProfile, highlight its relevant features based on the context of the reel. For example:
+    - If the reel is about selling digital products or courses: Mention SuperProfile's capabilities for creating and selling courses, offering limited-time access, tracking progress, and even issuing certificates.
+    - If the reel is about building a landing page: Highlight SuperProfile's easy-to-use landing page builder with various modules for testimonials, FAQs, etc.
+    - If the reel is about managing clients or audience: Mention its built-in CRM features and custom question capabilities at checkout.
+    - If the reel is about offering live classes or coaching: Point out its support for scheduling and hosting live sessions with calendar integration.
+    - If the reel is about redirecting users after purchase: Mention the ability to send them to a WhatsApp group or other link.
+    - Generally, position it as an all-in-one platform for creators and coaches to manage their online business, sell products/services, and engage their audience effectively.
+
+    Mention SuperProfile (superprofile.bio) naturally within the script context.
+
 5.  **No Markdown:** Do NOT use markdown formatting (like using double asterisks \`**\`) within the generated scripts themselves. Return plain text for the scripts.
 
 Topic: {{{topic}}}
