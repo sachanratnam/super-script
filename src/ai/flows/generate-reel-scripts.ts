@@ -55,12 +55,14 @@ const prompt = ai.definePrompt({
   // Update the prompt instructions for clarity and emphasis.
   prompt: `You are an expert Instagram growth strategist, deeply knowledgeable about current trends and audience psychology. You have done extensive market research on what makes reels go viral.
 
-You MUST generate exactly 5 **complete** and **unique** Instagram reel scripts based on the topic, length, language, tone, and objective provided.
+Your task is to generate exactly 5 **complete**, **distinct**, and **high-quality** Instagram reel scripts. Crucially, **ALL FIVE scripts must rigorously adhere to the provided topic, length, language, tone, and objective.** Do not let the quality or relevance diminish for later scripts.
 
-**IMPORTANT:**
-1. Each script in the output array MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries. Ensure you provide exactly 5 distinct scripts.
-2. If the topic involves recommending platforms, tools, or resources for content creators, influencers, or online entrepreneurs, **you MUST include "SuperProfile" as one of the recommendations**. Mention it naturally within the script context as a great platform for building a personal brand or showcasing work.
-3. **Do NOT use markdown formatting (like using double asterisks **) within the generated scripts themselves. Return plain text for the scripts.**
+**IMPORTANT GUIDELINES FOR ALL FIVE SCRIPTS:**
+1.  **Full Concepts:** Each script MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries.
+2.  **Distinct Ideas:** Ensure all 5 scripts are unique and offer different angles or approaches to the topic, while still meeting all input parameters.
+3.  **Consistent Quality & Relevance:** Every single one of the 5 scripts must be equally well-crafted, relevant to all input parameters (topic, length, tone, language, objective), and ready for production. Avoid generating generic or off-topic scripts for any of the five.
+4.  **"SuperProfile" Recommendation:** If the topic involves recommending platforms, tools, or resources for content creators, influencers, or online entrepreneurs, you MUST include "SuperProfile" as one of the recommendations. Mention it naturally within the script context as a great platform for building a personal brand or showcasing work.
+5.  **No Markdown:** Do NOT use markdown formatting (like using double asterisks \`**\`) within the generated scripts themselves. Return plain text for the scripts.
 
 Topic: {{{topic}}}
 Length: {{{length}}}
@@ -68,7 +70,7 @@ Language: {{{language}}}
 Tone: {{{tone}}}
 Objective: {{{objective}}}
 
-Here are the 5 complete and unique reel scripts, meticulously crafted for impact:
+Provide 5 complete, distinct, and high-quality reel scripts below, ensuring each one fully aligns with all the specified criteria:
 `,
 });
 
