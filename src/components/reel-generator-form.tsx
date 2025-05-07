@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -10,7 +9,7 @@ import { refineScript } from "@/ai/flows/refine-script-flow"; // Import refineme
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, AlertTriangle, Sparkles, ClipboardCopy, Share2, Edit3, Send, ChevronsDown, ChevronsUp } from "lucide-react";
+import { Loader2, AlertTriangle, Sparkles, ClipboardCopy, Share2, Edit3, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -312,289 +311,10 @@ export function ReelGeneratorForm() {
 
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 w-full bg-transparent">
-       <div className="w-full lg:w-2/5 flex-shrink-0">
-        <Card className="shadow-lg border-border/30 bg-card rounded-2xl overflow-hidden">
-           <CardHeader className="p-6 pb-4 bg-gradient-to-br from-card to-muted/30 dark:from-card dark:to-muted/10">
-             <CardTitle className="text-2xl font-semibold text-primary flex items-center gap-2.5">
-                <Sparkles className="w-6 h-6" />
-                Craft Your Reel Script
-             </CardTitle>
-            <CardDescription className="text-muted-foreground/90 pt-1.5">
-               Fill in the details below for engaging scripts developed from market research.
-            </CardDescription>
-          </CardHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <CardContent className="p-6 space-y-5">
-                <FormField
-                  control={form.control}
-                  name="topic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-medium text-foreground/90">Reel Topic</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe the core idea... e.g., 'Quick 3-ingredient healthy snacks for busy mornings'"
-                          {...field}
-                          className="min-h-[110px] resize-none bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner" 
-                          suppressHydrationWarning 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <FormField
-                    control={form.control}
-                    name="length"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-medium text-foreground/90">Length</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                             <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                              <SelectValue placeholder="Select length" />
-                            </SelectTrigger>
-                          </FormControl>
-                           <SelectContent className="rounded-lg shadow-xl"> 
-                            {["15s", "30s", "60s", "90s"].map((len) => (
-                              <SelectItem key={len} value={len} className="rounded-md">
-                                {len}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="language"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-medium text-foreground/90">Language</FormLabel>
-                        <Select
-                          key={defaultLanguage} 
-                          onValueChange={field.onChange}
-                          value={field.value} 
-                          >
-                          <FormControl>
-                            <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                              <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                          </FormControl>
-                            <SelectContent className="rounded-lg shadow-xl">
-                              <ScrollArea className="h-[220px]">
-                                {sortedLanguages.map((lang) => (
-                                  <SelectItem key={lang} value={lang} className="rounded-md">
-                                    {lang}
-                                  </SelectItem>
-                                ))}
-                              </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <FormField
-                    control={form.control}
-                    name="tone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-medium text-foreground/90">Tone</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                             <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                              <SelectValue placeholder="Select tone" />
-                            </SelectTrigger>
-                          </FormControl>
-                           <SelectContent className="rounded-lg shadow-xl">
-                             <ScrollArea className="h-[220px]">
-                              {tones.sort().map((t) => (
-                                <SelectItem key={t} value={t} className="rounded-md">
-                                  {t}
-                                </SelectItem>
-                              ))}
-                             </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="objective"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-medium text-foreground/90">Objective</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                             <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                              <SelectValue placeholder="Select objective" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="rounded-lg shadow-xl">
-                             <ScrollArea className="h-[220px]">
-                              {objectives.sort().map((obj) => (
-                                <SelectItem key={obj} value={obj} className="rounded-md">
-                                  {obj}
-                                </SelectItem>
-                              ))}
-                              </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="p-6 pt-4 flex justify-end bg-muted/30 dark:bg-muted/20 border-t border-border/30">
-                 <Button type="submit" disabled={isLoading || isTransferring} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-3 shadow-md hover:shadow-lg transition-shadow duration-300">
-                   {(isLoading || isTransferring) ? (
-                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      {isTransferring ? "Processing..." : "Generating..."}
-                    </>
-                  ) : (
-                     <>
-                      <Sparkles className="mr-2 h-5 w-5" />
-                      Generate Scripts
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
-          </Form>
-        </Card>
-      </div>
-
-       <div className="w-full lg:w-3/5 flex-grow flex flex-col">
-         <Card className="shadow-lg flex-grow flex flex-col border border-border/30 bg-card rounded-2xl overflow-hidden">
-          <CardHeader className="p-6 pb-3 border-b border-border/30">
-             <CardTitle className="text-xl font-semibold text-foreground/90 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-primary" /> 
-                 Your Tailored Reel Scripts
-             </CardTitle>
-             <CardDescription className="text-muted-foreground/90 pt-1.5">
-                 Here are the scripts developed from market research based on your input. Review, copy, and start creating! Select a script to refine it further.
-             </CardDescription>
-          </CardHeader>
-           <CardContent className="flex-grow overflow-hidden p-0 flex">
-              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px]"> 
-              <AnimatePresence mode="wait">
-                {error && (
-                   <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="w-full max-w-lg text-center">
-                     <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-lg shadow-inner">
-                       <AlertTriangle className="h-5 w-5 text-destructive" />
-                       <AlertTitle className="font-semibold">Generation Issue</AlertTitle>
-                       <AlertDescription className="text-destructive/90">{error}</AlertDescription>
-                     </Alert>
-                   </motion.div>
-                )}
-
-                {(isLoading || isTransferring) && (
-                   <motion.div key="loading" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center text-center space-y-4 text-primary">
-                    <AnimatePresence>
-                      {isTransferring && (
-                        <motion.div
-                          key="transferringInput"
-                          initial={{ opacity: 0, y: -20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 20, transition: { duration: 0.3 } }}
-                          className="flex flex-col items-center"
-                        >
-                          <Send className="w-12 h-12 text-primary mb-3" />
-                          <p className="text-lg font-medium text-foreground/80">Sending your creative brief...</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                     {!isTransferring && isLoading && (
-                       <motion.div
-                        key="generatingContent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1, transition: { delay: 0.5 } }} // Delay to allow transfer animation to finish
-                        className="flex flex-col items-center"
-                       >
-                          <div className="relative w-20 h-20">
-                             <motion.div className="absolute inset-0 border-4 border-primary/20 rounded-full" initial={{ scale: 0.8, opacity: 0.5 }} animate={{ scale: 1.1, opacity: 0 }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} />
-                             <motion.div className="absolute inset-2 border-4 border-primary/30 rounded-full" initial={{ scale: 0.9, opacity: 0.7 }} animate={{ scale: 1.05, opacity: 0.2 }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />
-                             <motion.div className="absolute inset-4 border-4 border-primary/40 rounded-full" initial={{ scale: 1, opacity: 0.9 }} animate={{ scale: 0.95, opacity: 0.4 }} transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} />
-                             <motion.div className="absolute inset-0 flex items-center justify-center" initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut"}} >
-                                <Sparkles className="w-10 h-10 text-primary opacity-90" />
-                             </motion.div>
-                          </div>
-                          <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p>
-                          <p className="text-sm text-muted-foreground max-w-xs">Building your scripts for maximum impact... please wait.</p>
-                        </motion.div>
-                     )}
-                  </motion.div>
-                )}
-
-                 {!isLoading && !isTransferring && generatedScripts && generatedScripts.scripts.length > 0 && (
-                   <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 p-6">
-                     <ScrollArea className="h-full w-full pr-1"> 
-                      <div className="space-y-6 pb-6"> 
-                        {generatedScripts.scripts.map((script, index) => (
-                          <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl">
-                             <CardHeader className="p-4 pb-2 bg-muted/30 dark:bg-muted/15 border-b border-border/50 flex flex-row items-center justify-between">
-                               <CardTitle className="text-base font-semibold text-primary">Script {index + 1}</CardTitle>
-                               <div className="flex items-center space-x-1">
-                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(script, "original", index)} aria-label={`Copy script ${index + 1}`} >
-                                    <ClipboardCopy className="h-4 w-4" />
-                                  </Button>
-                                   {typeof navigator !== 'undefined' && navigator.share && (
-                                       <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(script, "original", index)} aria-label={`Share script ${index + 1}`} >
-                                          <Share2 className="h-4 w-4" />
-                                        </Button>
-                                   )}
-                                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleSelectScriptForRefinement(script, index)}>
-                                    <Edit3 className="h-3 w-3 mr-1.5" /> Refine
-                                  </Button>
-                               </div>
-                            </CardHeader>
-                            <CardContent className="p-4">
-                               <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                   </motion.div>
-                )}
-
-                {!isLoading && !isTransferring && !generatedScripts && !error && (
-                   <motion.div key="initial" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center justify-center text-center space-y-4 text-muted-foreground/70">
-                     <Sparkles className="w-16 h-16 opacity-40" />
-                     <p className="text-xl font-medium">Ready for Results</p>
-                     <p className="text-sm max-w-sm">Your tailored Instagram reel scripts, backed by market insights, will appear here once you provide the details and click 'Generate'.</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-             </div>
-           </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-
-  // --- Refinement Section ---
-  return (
-    <>
+    <> {/* Main Fragment to wrap both sections */}
       {/* Initial Form and Results */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 w-full bg-transparent mb-8">
-        {/* Left Column / Top Section: Form (same as before) */}
+        {/* Left Column / Top Section: Form */}
         <div className="w-full lg:w-2/5 flex-shrink-0">
           <Card className="shadow-lg border-border/30 bg-card rounded-2xl overflow-hidden">
             <CardHeader className="p-6 pb-4 bg-gradient-to-br from-card to-muted/30 dark:from-card dark:to-muted/10">
@@ -609,20 +329,152 @@ export function ReelGeneratorForm() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <CardContent className="p-6 space-y-5">
-                  {/* ... FormFields for topic, length, language, tone, objective ... (same as before) */}
-                  <FormField control={form.control} name="topic" render={({ field }) => ( <FormItem> <FormLabel className="font-medium text-foreground/90">Reel Topic</FormLabel> <FormControl> <Textarea placeholder="Describe the core idea... e.g., 'Quick 3-ingredient healthy snacks for busy mornings'" {...field} className="min-h-[110px] resize-none bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner" suppressHydrationWarning /> </FormControl> <FormMessage /> </FormItem> )} />
+                  <FormField
+                    control={form.control}
+                    name="topic"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-medium text-foreground/90">Reel Topic</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe the core idea... e.g., 'Quick 3-ingredient healthy snacks for busy mornings'"
+                            {...field}
+                            className="min-h-[110px] resize-none bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"
+                            suppressHydrationWarning
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <FormField control={form.control} name="length" render={({ field }) => ( <FormItem> <FormLabel className="font-medium text-foreground/90">Length</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"> <SelectValue placeholder="Select length" /> </SelectTrigger> </FormControl> <SelectContent className="rounded-lg shadow-xl"> {["15s", "30s", "60s", "90s"].map((len) => ( <SelectItem key={len} value={len} className="rounded-md">{len}</SelectItem> ))} </SelectContent> </Select> <FormMessage /> </FormItem> )} />
-                    <FormField control={form.control} name="language" render={({ field }) => ( <FormItem> <FormLabel className="font-medium text-foreground/90">Language</FormLabel> <Select key={defaultLanguage} onValueChange={field.onChange} value={field.value} > <FormControl> <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"> <SelectValue placeholder="Select language" /> </SelectTrigger> </FormControl> <SelectContent className="rounded-lg shadow-xl"> <ScrollArea className="h-[220px]"> {sortedLanguages.map((lang) => ( <SelectItem key={lang} value={lang} className="rounded-md">{lang}</SelectItem> ))} </ScrollArea> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
+                    <FormField
+                      control={form.control}
+                      name="length"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-medium text-foreground/90">Length</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
+                                <SelectValue placeholder="Select length" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="rounded-lg shadow-xl">
+                              {["15s", "30s", "60s", "90s"].map((len) => (
+                                <SelectItem key={len} value={len} className="rounded-md">
+                                  {len}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="language"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-medium text-foreground/90">Language</FormLabel>
+                          <Select
+                            key={defaultLanguage}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
+                                <SelectValue placeholder="Select language" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="rounded-lg shadow-xl">
+                              <ScrollArea className="h-[220px]">
+                                {sortedLanguages.map((lang) => (
+                                  <SelectItem key={lang} value={lang} className="rounded-md">
+                                    {lang}
+                                  </SelectItem>
+                                ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <FormField control={form.control} name="tone" render={({ field }) => ( <FormItem> <FormLabel className="font-medium text-foreground/90">Tone</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"> <SelectValue placeholder="Select tone" /> </SelectTrigger> </FormControl> <SelectContent className="rounded-lg shadow-xl"> <ScrollArea className="h-[220px]"> {tones.sort().map((t) => ( <SelectItem key={t} value={t} className="rounded-md">{t}</SelectItem> ))} </ScrollArea> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
-                    <FormField control={form.control} name="objective" render={({ field }) => ( <FormItem> <FormLabel className="font-medium text-foreground/90">Objective</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl> <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"> <SelectValue placeholder="Select objective" /> </SelectTrigger> </FormControl> <SelectContent className="rounded-lg shadow-xl"> <ScrollArea className="h-[220px]"> {objectives.sort().map((obj) => ( <SelectItem key={obj} value={obj} className="rounded-md">{obj}</SelectItem> ))} </ScrollArea> </SelectContent> </Select> <FormMessage /> </FormItem> )} />
+                    <FormField
+                      control={form.control}
+                      name="tone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-medium text-foreground/90">Tone</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
+                                <SelectValue placeholder="Select tone" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="rounded-lg shadow-xl">
+                              <ScrollArea className="h-[220px]">
+                                {tones.sort().map((t) => (
+                                  <SelectItem key={t} value={t} className="rounded-md">
+                                    {t}
+                                  </SelectItem>
+                                ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="objective"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-medium text-foreground/90">Objective</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
+                                <SelectValue placeholder="Select objective" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="rounded-lg shadow-xl">
+                              <ScrollArea className="h-[220px]">
+                                {objectives.sort().map((obj) => (
+                                  <SelectItem key={obj} value={obj} className="rounded-md">
+                                    {obj}
+                                  </SelectItem>
+                                ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </CardContent>
                 <CardFooter className="p-6 pt-4 flex justify-end bg-muted/30 dark:bg-muted/20 border-t border-border/30">
                   <Button type="submit" disabled={isLoading || isTransferring} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-3 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    {(isLoading || isTransferring) ? (<><Loader2 className="mr-2 h-5 w-5 animate-spin" />{isTransferring ? "Processing..." : "Generating..."}</>) : (<><Sparkles className="mr-2 h-5 w-5" />Generate Scripts</>)}
+                    {(isLoading || isTransferring) ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        {isTransferring ? "Processing..." : "Generating..."}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-5 w-5" />
+                        Generate Scripts
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
               </form>
@@ -630,7 +482,7 @@ export function ReelGeneratorForm() {
           </Card>
         </div>
 
-        {/* Right Column / Bottom Section: Results (same as before) */}
+        {/* Right Column / Bottom Section: Results */}
         <div className="w-full lg:w-3/5 flex-grow flex flex-col">
           <Card className="shadow-lg flex-grow flex flex-col border border-border/30 bg-card rounded-2xl overflow-hidden">
             <CardHeader className="p-6 pb-3 border-b border-border/30">
@@ -639,16 +491,99 @@ export function ReelGeneratorForm() {
                 Your Tailored Reel Scripts
               </CardTitle>
               <CardDescription className="text-muted-foreground/90 pt-1.5">
-                Here are the scripts developed from market research. Review, copy, and create! Select a script to refine it further.
+                Here are the scripts developed from market research based on your input. Review, copy, and start creating! Select a script to refine it further.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden p-0 flex">
-              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px]">
+              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px] lg:min-h-0"> {/* Adjusted min-h for lg */}
                 <AnimatePresence mode="wait">
-                  {error && ( <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="w-full max-w-lg text-center"> <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-lg shadow-inner"> <AlertTriangle className="h-5 w-5 text-destructive" /> <AlertTitle className="font-semibold">Generation Issue</AlertTitle> <AlertDescription className="text-destructive/90">{error}</AlertDescription> </Alert> </motion.div> )}
-                  {(isLoading || isTransferring) && ( <motion.div key="loading" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center text-center space-y-4 text-primary"> <AnimatePresence> {isTransferring && ( <motion.div key="transferringInput" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20, transition: { duration: 0.3 } }} className="flex flex-col items-center"> <Send className="w-12 h-12 text-primary mb-3" /> <p className="text-lg font-medium text-foreground/80">Sending your creative brief...</p> </motion.div> )} </AnimatePresence> {!isTransferring && isLoading && ( <motion.div key="generatingContent" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.5 } }} className="flex flex-col items-center"> <div className="relative w-20 h-20"> <motion.div className="absolute inset-0 border-4 border-primary/20 rounded-full" initial={{ scale: 0.8, opacity: 0.5 }} animate={{ scale: 1.1, opacity: 0 }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} /> <motion.div className="absolute inset-2 border-4 border-primary/30 rounded-full" initial={{ scale: 0.9, opacity: 0.7 }} animate={{ scale: 1.05, opacity: 0.2 }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} /> <motion.div className="absolute inset-4 border-4 border-primary/40 rounded-full" initial={{ scale: 1, opacity: 0.9 }} animate={{ scale: 0.95, opacity: 0.4 }} transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} /> <motion.div className="absolute inset-0 flex items-center justify-center" initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut"}} > <Sparkles className="w-10 h-10 text-primary opacity-90" /> </motion.div> </div> <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p> <p className="text-sm text-muted-foreground max-w-xs">Building your scripts for maximum impact... please wait.</p> </motion.div> )} </motion.div> )}
-                  {!isLoading && !isTransferring && generatedScripts && generatedScripts.scripts.length > 0 && ( <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 p-6"> <ScrollArea className="h-full w-full pr-1"> <div className="space-y-6 pb-6"> {generatedScripts.scripts.map((script, index) => ( <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl"> <CardHeader className="p-4 pb-2 bg-muted/30 dark:bg-muted/15 border-b border-border/50 flex flex-row items-center justify-between"> <CardTitle className="text-base font-semibold text-primary">Script {index + 1}</CardTitle> <div className="flex items-center space-x-1"> <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(script, "original", index)} aria-label={`Copy script ${index + 1}`} > <ClipboardCopy className="h-4 w-4" /> </Button> {typeof navigator !== 'undefined' && navigator.share && ( <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(script, "original", index)} aria-label={`Share script ${index + 1}`} > <Share2 className="h-4 w-4" /> </Button> )} <Button variant="outline" size="sm" className="h-8 px-3 text-xs text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleSelectScriptForRefinement(script, index)}> <Edit3 className="h-3 w-3 mr-1.5" /> Refine </Button> </div> </CardHeader> <CardContent className="p-4"> <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</p> </CardContent> </Card> ))} </div> </ScrollArea> </motion.div> )}
-                  {!isLoading && !isTransferring && !generatedScripts && !error && ( <motion.div key="initial" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center justify-center text-center space-y-4 text-muted-foreground/70"> <Sparkles className="w-16 h-16 opacity-40" /> <p className="text-xl font-medium">Ready for Results</p> <p className="text-sm max-w-sm">Your tailored Instagram reel scripts, backed by market insights, will appear here once you provide the details and click 'Generate'.</p> </motion.div> )}
+                  {error && (
+                    <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="w-full max-w-lg text-center">
+                      <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-lg shadow-inner">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        <AlertTitle className="font-semibold">Generation Issue</AlertTitle>
+                        <AlertDescription className="text-destructive/90">{error}</AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
+
+                  {(isLoading || isTransferring) && (
+                    <motion.div key="loading" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center text-center space-y-4 text-primary">
+                      <AnimatePresence>
+                        {isTransferring && (
+                          <motion.div
+                            key="transferringInput"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20, transition: { duration: 0.3 } }}
+                            className="flex flex-col items-center"
+                          >
+                            <Send className="w-12 h-12 text-primary mb-3" />
+                            <p className="text-lg font-medium text-foreground/80">Sending your creative brief...</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      {!isTransferring && isLoading && (
+                        <motion.div
+                          key="generatingContent"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1, transition: { delay: 0.5 } }} // Delay to allow transfer animation to finish
+                          className="flex flex-col items-center"
+                        >
+                          <div className="relative w-20 h-20">
+                            <motion.div className="absolute inset-0 border-4 border-primary/20 rounded-full" initial={{ scale: 0.8, opacity: 0.5 }} animate={{ scale: 1.1, opacity: 0 }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} />
+                            <motion.div className="absolute inset-2 border-4 border-primary/30 rounded-full" initial={{ scale: 0.9, opacity: 0.7 }} animate={{ scale: 1.05, opacity: 0.2 }} transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />
+                            <motion.div className="absolute inset-4 border-4 border-primary/40 rounded-full" initial={{ scale: 1, opacity: 0.9 }} animate={{ scale: 0.95, opacity: 0.4 }} transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} />
+                            <motion.div className="absolute inset-0 flex items-center justify-center" initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }} >
+                              <Sparkles className="w-10 h-10 text-primary opacity-90" />
+                            </motion.div>
+                          </div>
+                          <p className="text-lg font-medium text-foreground/80 pt-4">{loadingMessage}</p>
+                          <p className="text-sm text-muted-foreground max-w-xs">Building your scripts for maximum impact... please wait.</p>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {!isLoading && !isTransferring && generatedScripts && generatedScripts.scripts.length > 0 && (
+                    <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 p-6">
+                      <ScrollArea className="h-full w-full pr-1">
+                        <div className="space-y-6 pb-6">
+                          {generatedScripts.scripts.map((script, index) => (
+                            <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl">
+                              <CardHeader className="p-4 pb-2 bg-muted/30 dark:bg-muted/15 border-b border-border/50 flex flex-row items-center justify-between">
+                                <CardTitle className="text-base font-semibold text-primary">Script {index + 1}</CardTitle>
+                                <div className="flex items-center space-x-1">
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(script, "original", index)} aria-label={`Copy script ${index + 1}`} >
+                                    <ClipboardCopy className="h-4 w-4" />
+                                  </Button>
+                                  {typeof navigator !== 'undefined' && navigator.share && (
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(script, "original", index)} aria-label={`Share script ${index + 1}`} >
+                                      <Share2 className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleSelectScriptForRefinement(script, index)}>
+                                    <Edit3 className="h-3 w-3 mr-1.5" /> Refine
+                                  </Button>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="p-4">
+                                <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </motion.div>
+                  )}
+
+                  {!isLoading && !isTransferring && !generatedScripts && !error && (
+                    <motion.div key="initial" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center justify-center text-center space-y-4 text-muted-foreground/70">
+                      <Sparkles className="w-16 h-16 opacity-40" />
+                      <p className="text-xl font-medium">Ready for Results</p>
+                      <p className="text-sm max-w-sm">Your tailored Instagram reel scripts, backed by market insights, will appear here once you provide the details and click 'Generate'.</p>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
               </div>
             </CardContent>
@@ -682,7 +617,7 @@ export function ReelGeneratorForm() {
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Original Script:</h3>
                   <ScrollArea className="h-32 p-3 border rounded-md bg-muted/30 dark:bg-muted/10">
-                     <p className="text-sm whitespace-pre-wrap text-foreground/80">{selectedScriptToRefine}</p>
+                    <p className="text-sm whitespace-pre-wrap text-foreground/80">{selectedScriptToRefine}</p>
                   </ScrollArea>
                 </div>
 
@@ -758,14 +693,14 @@ export function ReelGeneratorForm() {
                         )}
                       />
                     )}
-                     <div className="flex justify-end">
-                        <Button type="submit" disabled={isRefiningScript} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-3 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div className="flex justify-end">
+                      <Button type="submit" disabled={isRefiningScript} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-3 shadow-md hover:shadow-lg transition-shadow duration-300">
                         {isRefiningScript ? (
-                            <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Refining...</>
+                          <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Refining...</>
                         ) : (
-                            <><Edit3 className="mr-2 h-5 w-5" />Refine Script</>
+                          <><Edit3 className="mr-2 h-5 w-5" />Refine Script</>
                         )}
-                        </Button>
+                      </Button>
                     </div>
                   </form>
                 </Form>
@@ -774,16 +709,16 @@ export function ReelGeneratorForm() {
               {/* Display Refined Script */}
               <AnimatePresence mode="wait">
                 {isRefiningScript && (
-                    <motion.div
+                  <motion.div
                     key="refiningLoader"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className="p-6 pt-0 flex flex-col items-center justify-center text-center space-y-3 text-primary"
-                    >
+                  >
                     <Loader2 className="h-8 w-8 animate-spin" />
                     <p className="text-md font-medium text-foreground/70">Polishing your script...</p>
-                    </motion.div>
+                  </motion.div>
                 )}
                 {refinementError && (
                   <motion.div
