@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { GenerateReelScriptsInput, GenerateReelScriptsOutput } from "@/ai/flows/generate-reel-scripts";
 import { generateReelScripts } from "@/ai/flows/generate-reel-scripts";
-import type { RefineScriptInput, RefineScriptOutput } from "@/ai/flows/refine-script-flow"; // Import refinement types
+import type { RefineScriptInput } from "@/ai/flows/refine-script-flow"; // Import refinement types
 import { refineScript } from "@/ai/flows/refine-script-flow"; // Import refinement flow
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,9 +90,18 @@ const refinementFormSchema = z.object({
 });
 type RefinementFormValues = z.infer<typeof refinementFormSchema>;
 
+// --- Interface for Script Item State ---
+interface ScriptItem {
+  original: string;
+  refined?: string;
+  isRefining?: boolean;
+  refinementError?: string | null;
+  showRefinementForm?: boolean;
+}
+
 
 export function ReelGeneratorForm() {
-  const [generatedScripts, setGeneratedScripts] = useState<GenerateReelScriptsOutput | null>(null);
+  const [scriptItems, setScriptItems] = useState<ScriptItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -106,15 +115,8 @@ export function ReelGeneratorForm() {
 
   const [loadingMessage, setLoadingMessage] = useState("Initializing...");
 
-  // --- State for Script Refinement ---
-  const [selectedScriptToRefine, setSelectedScriptToRefine] = useState<string | null>(null);
+  // --- State for Script Context (used by refinement) ---
   const [selectedScriptContext, setSelectedScriptContext] = useState<GenerateReelScriptsInput | null>(null);
-  const [isRefiningScript, setIsRefiningScript] = useState(false);
-  const [refinementError, setRefinementError] = useState<string | null>(null);
-  const [refinedScriptResult, setRefinedScriptResult] = useState<string | null>(null);
-  const [showRefinementSection, setShowRefinementSection] = useState(false);
-  const refinementSectionRef = useRef<HTMLDivElement>(null);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -176,14 +178,11 @@ export function ReelGeneratorForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
-    setGeneratedScripts(null);
-    setShowRefinementSection(false); // Hide refinement section on new generation
-    setRefinedScriptResult(null);   // Clear previous refined script
+    setScriptItems([]); // Clear previous scripts and their states
 
-    setIsTransferring(true); // Start transfer animation
-    // Simulate transfer time
+    setIsTransferring(true); 
     await new Promise(resolve => setTimeout(resolve, 1000)); 
-    setIsTransferring(false); // End transfer animation
+    setIsTransferring(false); 
 
 
     try {
@@ -192,8 +191,8 @@ export function ReelGeneratorForm() {
        if (!result || !result.scripts || result.scripts.length === 0) {
            throw new Error("No scripts were generated. The generation process might have encountered an unexpected issue.");
        }
-      setGeneratedScripts(result);
-      setSelectedScriptContext(values); // Save context for potential refinement
+      setScriptItems(result.scripts.map(s => ({ original: s, showRefinementForm: false, refined: undefined, isRefining: false, refinementError: null })));
+      setSelectedScriptContext(values); 
        toast({ 
           title: "Scripts Crafted!", description: "Your high-impact reel scripts are ready.", variant: "default",
         });
@@ -209,24 +208,30 @@ export function ReelGeneratorForm() {
     }
   }
 
-  const handleSelectScriptForRefinement = (script: string, index: number) => {
-    setSelectedScriptToRefine(script);
-    setRefinedScriptResult(null); // Clear previous refined script
-    setRefinementError(null); // Clear previous refinement error
-    setShowRefinementSection(true);
-    refinementForm.reset(); // Reset refinement form
-    // Scroll to refinement section
-    setTimeout(() => {
-      refinementSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+  const handleToggleRefinementForm = (index: number) => {
+    setScriptItems(prevItems =>
+      prevItems.map((item, i) => {
+        if (i === index) {
+          const newShowRefinementForm = !item.showRefinementForm;
+          return {
+            ...item,
+            showRefinementForm: newShowRefinementForm,
+            refined: newShowRefinementForm ? undefined : item.refined, 
+            refinementError: newShowRefinementForm ? null : item.refinementError,
+          };
+        }
+        return { ...item, showRefinementForm: false }; // Close other forms
+      })
+    );
+    refinementForm.reset(); // Reset the global refinement form values
   };
 
-  async function onRefineSubmit(values: RefinementFormValues) {
-    if (!selectedScriptToRefine || !selectedScriptContext) return;
 
-    setIsRefiningScript(true);
-    setRefinementError(null);
-    setRefinedScriptResult(null);
+  async function onRefineSubmit(values: RefinementFormValues, scriptIndex: number) {
+    const currentScriptItem = scriptItems[scriptIndex];
+    if (!currentScriptItem || !selectedScriptContext) return;
+
+    setScriptItems(prev => prev.map((item, i) => i === scriptIndex ? { ...item, isRefining: true, refinementError: null } : item));
 
     let refinementGoal = "";
     switch (values.refinementType) {
@@ -246,7 +251,7 @@ export function ReelGeneratorForm() {
 
     try {
       const input: RefineScriptInput = {
-        originalScript: selectedScriptToRefine,
+        originalScript: currentScriptItem.original,
         topic: selectedScriptContext.topic,
         length: selectedScriptContext.length,
         language: selectedScriptContext.language,
@@ -258,25 +263,35 @@ export function ReelGeneratorForm() {
       if (!result || !result.refinedScript) {
         throw new Error("The refinement process failed to produce a script.");
       }
-      setRefinedScriptResult(result.refinedScript);
+      setScriptItems(prev =>
+        prev.map((item, i) =>
+          i === scriptIndex
+            ? { ...item, refined: result.refinedScript, isRefining: false, showRefinementForm: false }
+            : item
+        )
+      );
       toast({ title: "Script Refined!", description: "Your updated script is ready." });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
       console.error("Error refining script:", errorMessage);
-      setRefinementError("Oops! We hit a snag trying to refine that script. Maybe try a different refinement approach?");
+      setScriptItems(prev =>
+        prev.map((item, i) =>
+          i === scriptIndex
+            ? { ...item, refinementError: "Oops! We hit a snag trying to refine that script. Maybe try a different refinement approach?", isRefining: false }
+            : item
+        )
+      );
       toast({ title: "Refinement Issue", description: "Could not refine the script. Please try again.", variant: "destructive" });
-    } finally {
-      setIsRefiningScript(false);
     }
   }
 
 
-  const handleCopy = (script: string, type: "original" | "refined", index?: number) => {
+  const handleCopy = (scriptText: string, type: "original" | "refined", index?: number) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(script)
+      navigator.clipboard.writeText(scriptText)
         .then(() => {
             toast({
-              title: `${type === "original" ? `Script ${index! + 1}` : "Refined Script"} Copied!`,
+              title: `${type === "original" ? `Script ${index! + 1}` : `Refined Script ${index! + 1}`} Copied!`,
               description: "Ready to paste and create.",
             });
         })
@@ -289,11 +304,11 @@ export function ReelGeneratorForm() {
     }
   };
 
-  const handleShare = async (script: string, type: "original" | "refined", index?: number) => {
-    const title = type === "original" ? `Reel Script ${index! + 1}` : "Refined Reel Script";
+  const handleShare = async (scriptText: string, type: "original" | "refined", index?: number) => {
+    const title = type === "original" ? `Reel Script ${index! + 1}` : `Refined Reel Script ${index! + 1}`;
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ title, text: script });
+        await navigator.share({ title, text: scriptText });
         toast({ title: "Script Shared!", description: "Successfully shared the script." });
       } catch (error) {
         console.error('Error sharing:', error);
@@ -304,15 +319,14 @@ export function ReelGeneratorForm() {
         }
       }
     } else {
-      handleCopy(script, type, index); 
+      handleCopy(scriptText, type, index); 
       toast({ title: "Share Not Supported", description: "Web Share API not available. Script copied instead!", duration: 4000 });
     }
   };
 
 
   return (
-    <> {/* Main Fragment to wrap both sections */}
-      {/* Initial Form and Results */}
+    <> {/* Main Fragment */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 w-full bg-transparent mb-8">
         {/* Left Column / Top Section: Form */}
         <div className="w-full lg:w-2/5 flex-shrink-0">
@@ -495,7 +509,7 @@ export function ReelGeneratorForm() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden p-0 flex">
-              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px] lg:min-h-0"> {/* Adjusted min-h for lg */}
+              <div className="flex-grow flex flex-col justify-center items-center w-full bg-muted/20 dark:bg-muted/10 p-6 relative min-h-[400px] lg:min-h-0">
                 <AnimatePresence mode="wait">
                   {error && (
                     <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="w-full max-w-lg text-center">
@@ -508,7 +522,7 @@ export function ReelGeneratorForm() {
                   )}
 
                   {(isLoading || isTransferring) && (
-                    <motion.div key="loading" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center text-center space-y-4 text-primary">
+                     <motion.div key="loading" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center text-center space-y-4 text-primary">
                       <AnimatePresence>
                         {isTransferring && (
                           <motion.div
@@ -545,30 +559,135 @@ export function ReelGeneratorForm() {
                     </motion.div>
                   )}
 
-                  {!isLoading && !isTransferring && generatedScripts && generatedScripts.scripts.length > 0 && (
+                  {!isLoading && !isTransferring && scriptItems.length > 0 && (
                     <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 p-6">
                       <ScrollArea className="h-full w-full pr-1">
                         <div className="space-y-6 pb-6">
-                          {generatedScripts.scripts.map((script, index) => (
+                          {scriptItems.map((item, index) => (
                             <Card key={index} className="bg-background shadow-sm border border-border/50 overflow-hidden rounded-xl">
                               <CardHeader className="p-4 pb-2 bg-muted/30 dark:bg-muted/15 border-b border-border/50 flex flex-row items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-primary">Script {index + 1}</CardTitle>
+                                <CardTitle className="text-base font-semibold text-primary">
+                                  {item.refined ? `Refined Script ${index + 1}` : `Script ${index + 1}`}
+                                </CardTitle>
                                 <div className="flex items-center space-x-1">
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(script, "original", index)} aria-label={`Copy script ${index + 1}`} >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(item.refined || item.original, item.refined ? "refined" : "original", index)} aria-label={`Copy script ${index + 1}`} >
                                     <ClipboardCopy className="h-4 w-4" />
                                   </Button>
                                   {typeof navigator !== 'undefined' && navigator.share && (
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(script, "original", index)} aria-label={`Share script ${index + 1}`} >
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(item.refined || item.original, item.refined ? "refined" : "original", index)} aria-label={`Share script ${index + 1}`} >
                                       <Share2 className="h-4 w-4" />
                                     </Button>
                                   )}
-                                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleSelectScriptForRefinement(script, index)}>
-                                    <Edit3 className="h-3 w-3 mr-1.5" /> Refine
+                                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs text-primary border-primary/50 hover:bg-primary/10" onClick={() => handleToggleRefinementForm(index)}>
+                                    <Edit3 className="h-3 w-3 mr-1.5" /> {item.showRefinementForm ? 'Cancel' : 'Refine'}
                                   </Button>
                                 </div>
                               </CardHeader>
                               <CardContent className="p-4">
-                                <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{script}</p>
+                                <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
+                                  {item.refined || item.original}
+                                </p>
+                                <AnimatePresence>
+                                  {item.showRefinementForm && (
+                                    <motion.div
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: 'auto', transition: { duration: 0.3, ease: "easeInOut" } }}
+                                      exit={{ opacity: 0, height: 0, transition: { duration: 0.2, ease: "easeInOut" } }}
+                                      className="mt-4 pt-4 border-t border-border/30"
+                                    >
+                                      <Form {...refinementForm}>
+                                        <form onSubmit={refinementForm.handleSubmit(data => onRefineSubmit(data, index))} className="space-y-4">
+                                          <FormField
+                                            control={refinementForm.control}
+                                            name="refinementType"
+                                            render={({ field }) => (
+                                              <FormItem>
+                                                <FormLabel className="font-medium text-xs text-muted-foreground">Refinement Type</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                  <FormControl>
+                                                    <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-md shadow-inner h-9 text-xs">
+                                                      <SelectValue placeholder="Select refinement type" />
+                                                    </SelectTrigger>
+                                                  </FormControl>
+                                                  <SelectContent className="rounded-lg shadow-xl">
+                                                    <SelectItem value="CONCISE" className="rounded-md text-xs">Make it more concise</SelectItem>
+                                                    <SelectItem value="DETAILED" className="rounded-md text-xs">Add more detail</SelectItem>
+                                                    <SelectItem value="CHANGE_TONE" className="rounded-md text-xs">Change the tone</SelectItem>
+                                                    <SelectItem value="ENHANCE_CTA" className="rounded-md text-xs">Enhance CTA</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+
+                                          {watchRefinementType === "CHANGE_TONE" && (
+                                            <FormField
+                                              control={refinementForm.control}
+                                              name="newTone"
+                                              render={({ field }) => (
+                                                <FormItem>
+                                                  <FormLabel className="font-medium text-xs text-muted-foreground">New Tone</FormLabel>
+                                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                      <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-md shadow-inner h-9 text-xs">
+                                                        <SelectValue placeholder="Select new tone" />
+                                                      </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="rounded-lg shadow-xl">
+                                                      <ScrollArea className="h-[150px]">
+                                                        {tones.sort().map((t) => (
+                                                          <SelectItem key={t} value={t} className="rounded-md text-xs">{t}</SelectItem>
+                                                        ))}
+                                                      </ScrollArea>
+                                                    </SelectContent>
+                                                  </Select>
+                                                  <FormMessage />
+                                                </FormItem>
+                                              )}
+                                            />
+                                          )}
+
+                                          {watchRefinementType === "ENHANCE_CTA" && (
+                                            <FormField
+                                              control={refinementForm.control}
+                                              name="ctaFocus"
+                                              render={({ field }) => (
+                                                <FormItem>
+                                                  <FormLabel className="font-medium text-xs text-muted-foreground">CTA Focus</FormLabel>
+                                                  <FormControl>
+                                                    <Input
+                                                      placeholder="e.g., Visit website, follow"
+                                                      {...field}
+                                                      className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-md shadow-inner h-9 text-xs"
+                                                    />
+                                                  </FormControl>
+                                                  <FormMessage />
+                                                </FormItem>
+                                              )}
+                                            />
+                                          )}
+                                          <div className="flex justify-end">
+                                            <Button type="submit" disabled={item.isRefining} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 text-xs shadow-sm hover:shadow-md transition-shadow duration-300">
+                                              {item.isRefining ? (
+                                                <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" />Refining...</>
+                                              ) : (
+                                                <><Edit3 className="mr-1.5 h-4 w-4" />Refine Script</>
+                                              )}
+                                            </Button>
+                                          </div>
+                                        </form>
+                                      </Form>
+                                      {item.refinementError && (
+                                        <Alert variant="destructive" className="mt-4 bg-destructive/10 border-destructive/30 rounded-md shadow-inner text-xs">
+                                          <AlertTriangle className="h-4 w-4 text-destructive" />
+                                          <AlertTitle className="font-semibold text-xs">Refinement Error</AlertTitle>
+                                          <AlertDescription className="text-destructive/90 text-xs">{item.refinementError}</AlertDescription>
+                                        </Alert>
+                                      )}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </CardContent>
                             </Card>
                           ))}
@@ -577,7 +696,7 @@ export function ReelGeneratorForm() {
                     </motion.div>
                   )}
 
-                  {!isLoading && !isTransferring && !generatedScripts && !error && (
+                  {!isLoading && !isTransferring && scriptItems.length === 0 && !error && (
                     <motion.div key="initial" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center justify-center text-center space-y-4 text-muted-foreground/70">
                       <Sparkles className="w-16 h-16 opacity-40" />
                       <p className="text-xl font-medium">Ready for Results</p>
@@ -591,184 +710,7 @@ export function ReelGeneratorForm() {
         </div>
       </div>
 
-      {/* Refinement Section - Appears when a script is selected */}
-      <AnimatePresence>
-        {showRefinementSection && selectedScriptToRefine && (
-          <motion.div
-            key="refinementSection"
-            ref={refinementSectionRef}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto', transition: { duration: 0.5, ease: "easeInOut" } }}
-            exit={{ opacity: 0, height: 0, transition: { duration: 0.3, ease: "easeInOut" } }}
-            className="w-full"
-          >
-            <Separator className="my-8" />
-            <Card className="shadow-lg border-border/30 bg-card rounded-2xl overflow-hidden">
-              <CardHeader className="p-6 pb-4 bg-gradient-to-br from-card to-muted/30 dark:from-card dark:to-muted/10">
-                <CardTitle className="text-xl font-semibold text-primary flex items-center gap-2.5">
-                  <Edit3 className="w-5 h-5" />
-                  Refine Your Script
-                </CardTitle>
-                <CardDescription className="text-muted-foreground/90 pt-1.5">
-                  Adjust the selected script to better fit your needs.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Original Script:</h3>
-                  <ScrollArea className="h-32 p-3 border rounded-md bg-muted/30 dark:bg-muted/10">
-                    <p className="text-sm whitespace-pre-wrap text-foreground/80">{selectedScriptToRefine}</p>
-                  </ScrollArea>
-                </div>
-
-                <Form {...refinementForm}>
-                  <form onSubmit={refinementForm.handleSubmit(onRefineSubmit)} className="space-y-5">
-                    <FormField
-                      control={refinementForm.control}
-                      name="refinementType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="font-medium text-foreground/90">How would you like to refine it?</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                                <SelectValue placeholder="Select refinement type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="rounded-lg shadow-xl">
-                              <SelectItem value="CONCISE" className="rounded-md">Make it more concise</SelectItem>
-                              <SelectItem value="DETAILED" className="rounded-md">Add more detail / Make it longer</SelectItem>
-                              <SelectItem value="CHANGE_TONE" className="rounded-md">Change the tone</SelectItem>
-                              <SelectItem value="ENHANCE_CTA" className="rounded-md">Enhance the Call to Action</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {watchRefinementType === "CHANGE_TONE" && (
-                      <FormField
-                        control={refinementForm.control}
-                        name="newTone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-medium text-foreground/90">Select New Tone</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
-                                  <SelectValue placeholder="Select a new tone" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="rounded-lg shadow-xl">
-                                <ScrollArea className="h-[200px]">
-                                  {tones.sort().map((t) => (
-                                    <SelectItem key={t} value={t} className="rounded-md">{t}</SelectItem>
-                                  ))}
-                                </ScrollArea>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    {watchRefinementType === "ENHANCE_CTA" && (
-                      <FormField
-                        control={refinementForm.control}
-                        name="ctaFocus"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-medium text-foreground/90">Call to Action Focus</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g., Visit my website, follow for more, comment below"
-                                {...field}
-                                className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    )}
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={isRefiningScript} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-3 shadow-md hover:shadow-lg transition-shadow duration-300">
-                        {isRefiningScript ? (
-                          <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Refining...</>
-                        ) : (
-                          <><Edit3 className="mr-2 h-5 w-5" />Refine Script</>
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </CardContent>
-
-              {/* Display Refined Script */}
-              <AnimatePresence mode="wait">
-                {isRefiningScript && (
-                  <motion.div
-                    key="refiningLoader"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="p-6 pt-0 flex flex-col items-center justify-center text-center space-y-3 text-primary"
-                  >
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <p className="text-md font-medium text-foreground/70">Polishing your script...</p>
-                  </motion.div>
-                )}
-                {refinementError && (
-                  <motion.div
-                    key="refinementError"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="p-6 pt-0"
-                  >
-                    <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 rounded-lg shadow-inner">
-                      <AlertTriangle className="h-5 w-5 text-destructive" />
-                      <AlertTitle className="font-semibold">Refinement Error</AlertTitle>
-                      <AlertDescription className="text-destructive/90">{refinementError}</AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-                {!isRefiningScript && refinedScriptResult && (
-                  <motion.div
-                    key="refinedResult"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-6 pt-0"
-                  >
-                    <Card className="bg-background shadow-sm border border-primary/30 overflow-hidden rounded-xl">
-                      <CardHeader className="p-4 pb-2 bg-primary/10 dark:bg-primary/20 border-b border-primary/30 flex flex-row items-center justify-between">
-                        <CardTitle className="text-base font-semibold text-primary">
-                          Refined Script
-                        </CardTitle>
-                        <div className="flex items-center space-x-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleCopy(refinedScriptResult, "refined")} aria-label="Copy refined script">
-                            <ClipboardCopy className="h-4 w-4" />
-                          </Button>
-                          {typeof navigator !== 'undefined' && navigator.share && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleShare(refinedScriptResult, "refined")} aria-label="Share refined script">
-                              <Share2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="p-4">
-                        <p className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">{refinedScriptResult}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }
+
