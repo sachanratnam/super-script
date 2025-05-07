@@ -23,7 +23,7 @@ const RefineScriptInputSchema = z.object({
 export type RefineScriptInput = z.infer<typeof RefineScriptInputSchema>;
 
 const RefineScriptOutputSchema = z.object({
-  refinedScript: z.string().describe('The refined reel script, ensuring no markdown like ** is used.'),
+  refinedScript: z.string().describe('The refined reel script, ensuring no markdown like ** is used and no hashtags like #topic are included.'),
 });
 export type RefineScriptOutput = z.infer<typeof RefineScriptOutputSchema>;
 
@@ -54,7 +54,11 @@ Original Context:
 
 Refinement Goal: {{{refinementGoal}}}
 
-Please provide the refined script below. Ensure the refined script is a complete piece of text and does not use any markdown formatting (like ** for bolding).
+Please provide the refined script below. 
+**IMPORTANT GUIDELINES FOR THE REFINED SCRIPT:**
+1.  Ensure the refined script is a complete piece of text.
+2.  Do NOT use any markdown formatting (like ** for bolding).
+3.  Do NOT include any hashtags (e.g., #topic, #viral).
 The refined script should still be suitable for the original length constraint unless the refinement goal explicitly asks to change it (e.g. "Make it shorter", "Make it longer").
 If the goal is to change the tone, ensure the new tone is applied effectively.
 If the goal is to enhance the CTA, make it compelling and clear.
@@ -75,8 +79,8 @@ const refineScriptFlow = ai.defineFlow<
     if (!output || !output.refinedScript) {
       throw new Error('The refinement process failed to produce a script.');
     }
-     // Post-process script to remove any remaining markdown bold formatting (**)
-    const cleanedScript = output.refinedScript.replace(/\*\*/g, '');
+     // Post-process script to remove any remaining markdown bold formatting (**) and hashtags (#word)
+    const cleanedScript = output.refinedScript.replace(/\*\*/g, '').replace(/#\w+/g, '').trim();
     return { refinedScript: cleanedScript };
   }
 );

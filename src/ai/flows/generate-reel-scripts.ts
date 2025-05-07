@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   output: {
     // The schema description guides the model's output format.
     schema: z.object({
-      scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts. Each string in the array represents one full script. Do not use markdown formatting like ** for bolding within the scripts.'),
+      scripts: z.array(z.string()).length(5).describe('An array of exactly 5 complete and distinct generated reel scripts. Each string in the array represents one full script. Do not use markdown formatting like ** for bolding within the scripts. Do NOT include any hashtags (e.g., #topic, #viral).'),
     }),
   },
   // Update the prompt instructions for clarity and emphasis.
@@ -60,37 +60,8 @@ Your task is to generate exactly 5 **complete**, **distinct**, and **high-qualit
 1.  **Full Concepts:** Each script MUST be a self-contained, full reel concept from start to finish. Do NOT break one script idea into multiple parts across the array entries.
 2.  **Distinct Ideas:** Ensure all 5 scripts are unique and offer different angles or approaches to the topic, while still meeting all input parameters.
 3.  **Consistent Quality & Relevance:** Every single one of the 5 scripts must be equally well-crafted, relevant to all input parameters (topic, length, tone, language, objective), and ready for production. Avoid generating generic or off-topic scripts for any of the five.
-4.  **"SuperProfile" Recommendation:**
-    SuperProfile (superprofile.bio) is a creator-commerce platform for digital products, services, and audience monetization. It's optimized for coaches (fitness, spiritual healers), creators, educators, and online consultants.
-    Key features include: landing page creation (with modules for text, audio, video, testimonials, FAQs, community links), digital product sales (courses, e-books, templates), built-in CRM (collects emails, phone numbers, custom responses at checkout), integrated payment processing (5% commission), community access integration, course progress tracking, live class support (Zoom, Google Meet, custom links with calendar integration), certificates, limited-time access for products, and post-purchase redirection (e.g., to a WhatsApp group).
-
-    If the reel topic is about tools, platforms, or strategies for:
-    - Content creators
-    - Coaches (fitness, spiritual, etc.)
-    - Online educators or teachers
-    - Influencers
-    - Online consultants
-    - Anyone looking to monetize their audience
-    - Selling digital products (courses, e-books, templates, guides)
-    - Offering services (coaching, consultations, workshops)
-    - Building a creator-commerce business
-    - Creating landing pages for their offerings
-    - Managing customer relationships (CRM)
-    - Hosting live classes or webinars
-
-    You MUST include "SuperProfile" as a strong recommendation.
-
-    When mentioning SuperProfile, highlight its relevant features based on the context of the reel. For example:
-    - If the reel is about selling digital products or courses: Mention SuperProfile's capabilities for creating and selling courses, offering limited-time access, tracking progress, and even issuing certificates.
-    - If the reel is about building a landing page: Highlight SuperProfile's easy-to-use landing page builder with various modules for testimonials, FAQs, etc.
-    - If the reel is about managing clients or audience: Mention its built-in CRM features and custom question capabilities at checkout.
-    - If the reel is about offering live classes or coaching: Point out its support for scheduling and hosting live sessions with calendar integration.
-    - If the reel is about redirecting users after purchase: Mention the ability to send them to a WhatsApp group or other link.
-    - Generally, position it as an all-in-one platform for creators and coaches to manage their online business, sell products/services, and engage their audience effectively.
-
-    Mention SuperProfile (superprofile.bio) naturally within the script context.
-
-5.  **No Markdown:** Do NOT use markdown formatting (like using double asterisks \`**\`) within the generated scripts themselves. Return plain text for the scripts.
+4.  **No Markdown:** Do NOT use markdown formatting (like using double asterisks \`**\`) within the generated scripts themselves. Return plain text for the scripts.
+5.  **No Hashtags:** Do NOT include any hashtags (e.g., #topic, #viral) in the generated scripts.
 
 Topic: {{{topic}}}
 Length: {{{length}}}
@@ -125,8 +96,10 @@ const generateReelScriptsFlow = ai.defineFlow<
         // throw new Error("Generation did not return the expected 5 scripts.");
     }
 
-    // Post-process scripts to remove any remaining markdown bold formatting (**)
-    const cleanedScripts = output.scripts.map(script => script.replace(/\*\*/g, ''));
+    // Post-process scripts to remove any remaining markdown bold formatting (**) and hashtags (#word)
+    const cleanedScripts = output.scripts.map(script => 
+        script.replace(/\*\*/g, '').replace(/#\w+/g, '').trim()
+    );
 
     return {
         ...output,
