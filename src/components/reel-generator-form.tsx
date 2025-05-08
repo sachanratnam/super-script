@@ -118,6 +118,10 @@ export function ReelGeneratorForm() {
   // --- State for Script Context (used by refinement) ---
   const [selectedScriptContext, setSelectedScriptContext] = useState<GenerateReelScriptsInput | null>(null);
 
+  // Refs for scrolling to refinement forms
+  const refinementFormRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -175,6 +179,22 @@ export function ReelGeneratorForm() {
   // Animation state for transferring input
   const [isTransferring, setIsTransferring] = useState(false);
 
+  // Effect to scroll to the opened refinement form
+  useEffect(() => {
+    const openFormIndex = scriptItems.findIndex(item => item.showRefinementForm);
+    if (openFormIndex !== -1 && refinementFormRefs.current[openFormIndex]) {
+      // Use a timeout to allow the animation to start/complete
+      const timer = setTimeout(() => {
+        refinementFormRefs.current[openFormIndex]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest', // Can also be 'start', 'center', or 'end'
+        });
+      }, 350); // Adjust delay to match animation (0.3s) + small buffer
+      return () => clearTimeout(timer);
+    }
+  }, [scriptItems]);
+
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
@@ -192,6 +212,8 @@ export function ReelGeneratorForm() {
            throw new Error("No scripts were generated. The generation process might have encountered an unexpected issue.");
        }
       setScriptItems(result.scripts.map(s => ({ original: s, showRefinementForm: false, refined: undefined, isRefining: false, refinementError: null })));
+      // Initialize refs array length based on new script items
+      refinementFormRefs.current = result.scripts.map(() => null);
       setSelectedScriptContext(values); 
        toast({ 
           title: "Scripts Crafted!", description: "Your high-impact reel scripts are ready.", variant: "default",
@@ -395,9 +417,9 @@ export function ReelGeneratorForm() {
                         <FormItem>
                           <FormLabel className="font-medium text-foreground/90">Language</FormLabel>
                           <Select
-                            key={defaultLanguage}
+                            key={defaultLanguage} // Ensures re-render if defaultLanguage changes (though not expected here)
                             onValueChange={field.onChange}
-                            value={field.value}
+                            value={field.value} 
                           >
                             <FormControl>
                               <SelectTrigger className="bg-input/50 dark:bg-input/20 focus:bg-input border-input focus:border-primary focus:ring-1 focus:ring-primary rounded-lg shadow-inner">
@@ -590,6 +612,7 @@ export function ReelGeneratorForm() {
                                 <AnimatePresence>
                                   {item.showRefinementForm && (
                                     <motion.div
+                                      ref={el => refinementFormRefs.current[index] = el}
                                       initial={{ opacity: 0, height: 0 }}
                                       animate={{ opacity: 1, height: 'auto', transition: { duration: 0.3, ease: "easeInOut" } }}
                                       exit={{ opacity: 0, height: 0, transition: { duration: 0.2, ease: "easeInOut" } }}
@@ -713,4 +736,3 @@ export function ReelGeneratorForm() {
     </>
   );
 }
-
